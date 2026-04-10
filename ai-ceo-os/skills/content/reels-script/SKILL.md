@@ -20,6 +20,9 @@ allowed-tools: Read, Grep, Glob, WebSearch
 - `context/ceo-persona.md` (CEO 톤앤매너 — 말투, 금지 표현, 말끝 스타일)
 - `context/channel-rules.md` (채널별 규칙 — 해시태그, CTA 방식)
 
+### 타이밍 참고 (필수)
+- `knowledge/reels-structure-analysis.md` — 후킹/본문/CTA 초 단위 구조 + CTA 문구 패턴
+
 ### 조건부 로드
 - `knowledge/channel-data/` 하위 본인의 실제 릴스 인사이트(있으면) — 검증된 후킹 패턴 추출
 - `tasks/lessons.md` — 콘텐츠 관련 과거 교훈
@@ -189,5 +192,6 @@ allowed-tools: Read, Grep, Glob, WebSearch
 
 > CEO 피드백 시 이 섹션에 자동 추가됩니다. 다음 실행부터 반영.
 
-<!-- 예시 (수강생이 자기 것으로 교체) -->
 - (2026-MM-DD) "릴스 대본은 기본 3×3으로 출력할 것. CEO가 별도 개수 지정 없으면 항상 3버전."
+- (2026-04-11) "대본 구조는 반드시 [후킹] → [본문] → [CTA] 3단 구조로 명확히 구분할 것."
+- (2026-04-11) "CTA 문구에 계정명 'AI SAVER' 반드시 포함할 것."
