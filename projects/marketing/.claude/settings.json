@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Write(//**)",
+      "Edit(//**)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git pull:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Bash(rm -rf /:*)",
+      "Bash(sudo:*)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "echo \"[프로젝트명] | $(git branch --show-current 2>/dev/null || echo 'no-git') | $(date '+%H:%M')\""
+  },
+  "env": {
+    "PROJECT_VERSION": "0.1.0"
+  },
+  "_comment": "settings.json 커스터마이징: permissions.allow에 필요한 툴 추가, statusLine으로 하단 상태표시줄 설정, hooks로 자동화 행동 등록"
+}
