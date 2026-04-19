@@ -38,6 +38,24 @@
 
 ---
 
+## 3-레이어 아키텍처 (운영 사업부)
+
+| 레이어 | 운영 적용 | 위치 |
+|:---|:---|:---|
+| **Layer 1: Directive** | 주간 브리핑 SOP, 루틴 설계 SOP | `directives/` |
+| **Layer 2: Orchestration** | COO가 Directive 읽고 브리핑 구성 | AI (김이사) |
+| **Layer 3: Execution** | KPI 집계 스크립트, 일정 자동화 | `../../execution/` |
+
+### 도구 우선 확인 원칙
+주간 리뷰 시작 전 `../../execution/`에 통계 수집 스크립트가 있으면 먼저 실행.
+데이터 없으면 "데이터가 필요합니다"로 응답 (Zero-Inference).
+
+### Self-Annealing
+- 루틴 붕괴 패턴 발견 → `directives/` SOP에 예방 조치 추가
+- 병목 작업 반복 발생 → 자동화 스크립트 작성 후 `../../execution/`에 저장
+
+---
+
 ## 산출물 저장 경로
 
 ```

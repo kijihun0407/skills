@@ -39,6 +39,24 @@
 
 ---
 
+## 3-레이어 아키텍처 (고객 사업부)
+
+| 레이어 | 고객 적용 | 위치 |
+|:---|:---|:---|
+| **Layer 1: Directive** | DM 응대 SOP, 전환 온보딩 SOP | `directives/` |
+| **Layer 2: Orchestration** | CXO가 Directive 읽고 응대 방식 결정 | AI (김이사) |
+| **Layer 3: Execution** | 피드백 수집 스크립트, 전환율 계산 | `../../execution/` |
+
+### 도구 우선 확인 원칙
+DM 패턴 분석 시 `../../execution/`에 기존 수집 도구 확인 후 진행.
+전환율 등 수치는 스크립트 결과만 인용 (추측 금지).
+
+### Self-Annealing
+- 응대 패턴에서 자주 묻는 질문 발견 → `directives/` DM 응대 SOP에 추가
+- 전환 실패 패턴 파악 → 온보딩 플로우 SOP 업데이트
+
+---
+
 ## 산출물 저장 경로
 
 ```
