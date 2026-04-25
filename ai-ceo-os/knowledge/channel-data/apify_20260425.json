@@ -1,0 +1,809 @@
+{
+  "fetched_at": "2026-04-25T14:56:15.817852",
+  "my_account": "ai.saver_h",
+  "competitor_accounts": [
+    "biggie_ai",
+    "ai_dori_",
+    "ai_ing_",
+    "brivvy_ai",
+    "ai.trend.kr",
+    "ai_freaks.kr",
+    "ai.favmag",
+    "promppy_com",
+    "ai.yeongseon",
+    "thisiskeepkwan"
+  ],
+  "raw_item_count": 201,
+  "summary": {
+    "promppy_com": {
+      "username": "promppy_com",
+      "followers": 73369,
+      "following": null,
+      "biography": "🤖 인공지능 뉴스 & 최신 트렌드 요약\n⚡ 매일 AI 세상의 변화를 쉽고 빠르게\n📲 팔로우하고 최신 인사이트 먼저 만나보세요",
+      "posts_scraped": 20,
+      "avg_likes": 516.1,
+      "avg_comments": 20.5,
+      "avg_video_plays": 0,
+      "top_posts": [
+        {
+          "id": "3881453904244647877",
+          "type": "Image",
+          "timestamp": "2026-04-23T06:23:04.000Z",
+          "caption": "🌿 핀란드, 고무 놀이터를 흙과 토양으로 교체… 1년 내 아동 건강 개선 관찰\n\n🧪 자갈과 아스팔트 중심의 기존 놀이터를\n이끼, 낙엽, 야생 식생이 포함된 숲 바닥 환경으로 전환한",
+          "likes": 5459,
+          "comments": 211,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXdscLWjifF/"
+        },
+        {
+          "id": "3881543523275277435",
+          "type": "Image",
+          "timestamp": "2026-04-23T09:21:09.000Z",
+          "caption": "💾 샌디스크, 2TB UHS-II SD 카드 출시… 가격 약 300만 원 수준\n\n🧪 샌디스크가 Extreme Pro UHS-II SD 카드 공개.\n단일 SD 카드 기준 2TB 초대",
+          "likes": 1453,
+          "comments": 51,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXeA0TlCoR7/"
+        },
+        {
+          "id": "3881963267167017890",
+          "type": "Image",
+          "timestamp": "2026-04-23T23:15:05.000Z",
+          "caption": "🧠 신경과학에 따르면, 가장 높은 수준의 지능은 ‘자신의 생각을 인식하는 능력’\n\n📊 많은 사람들은 지능을 빠른 사고력이나 지식의 양으로 판단하지만,\n신경과학에서는 그보다 더 깊은",
+          "likes": 1117,
+          "comments": 101,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXfgQYimtui/"
+        },
+        {
+          "id": "3882052880743645052",
+          "type": "Sidecar",
+          "timestamp": "2026-04-24T02:13:07.000Z",
+          "caption": "🌐 한 남성, 유일한 할아버지 사진 복원을 위해 인터넷에 도움 요청\n\n심각하게 손상된 한 장의 가족 사진\n할아버지 얼굴 부분이 물리적으로 벗겨져 거의 사라진 상태\n복원이 불가능해 ",
+          "likes": 676,
+          "comments": 5,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXf0obsAb98/"
+        },
+        {
+          "id": "3881332110892737967",
+          "type": "Image",
+          "timestamp": "2026-04-23T02:21:05.000Z",
+          "caption": "🧬 생후 9개월 영아, 살아있는 상태에서 DNA 재작성 최초 사례\n\n🧪 미국 필라델피아의 영아 KJ,\n암모니아를 처리하지 못하는 희귀 유전질환으로 출생.\n식사 시 독성 물질 축적 ",
+          "likes": 361,
+          "comments": 7,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXdQv2dFCWv/"
+        }
+      ]
+    },
+    "ai.trend.kr": {
+      "username": "ai.trend.kr",
+      "followers": 131498,
+      "following": null,
+      "biography": "놓치면 안 될 AI 트렌드, 에트 매거진\nㅤ-\n📨 aitrend.korea@gmail.com",
+      "posts_scraped": 20,
+      "avg_likes": 2298.0,
+      "avg_comments": 183.9,
+      "avg_video_plays": 93119.2,
+      "top_posts": [
+        {
+          "id": "3876429860336378348",
+          "type": "Video",
+          "timestamp": "2026-04-16T08:01:46.000Z",
+          "caption": "이 광고를 만든 건 팀이 아닙니다. 딱 한 명, 오후 한나절이면 충분했거든요.🎬\n\nRunway가 공개한 이 숏폼 광고는 한 명의 크리에이터가 Runway로 완성한 결과물입니다. 촬",
+          "likes": 21190,
+          "comments": 72,
+          "video_plays": 436668,
+          "url": "https://www.instagram.com/p/DXL2Gt2ESHs/"
+        },
+        {
+          "id": "3880095765037678736",
+          "type": "Video",
+          "timestamp": "2026-04-21T09:25:24.000Z",
+          "caption": "2019년에 1,550만 명을 울린 영상이 7년 만에 다시 터지고 있습니다. 🚖\n\n서울 최초 청각장애인 택시기사 이대호 씨. 소리 없는 세상에서 매일 핸들을 잡았던 그에게 현대차가",
+          "likes": 8321,
+          "comments": 64,
+          "video_plays": 160669,
+          "url": "https://www.instagram.com/p/DXY3oppkYCQ/"
+        },
+        {
+          "id": "3876931986615384296",
+          "type": "Video",
+          "timestamp": "2026-04-17T00:40:21.000Z",
+          "caption": "왕좌의 게임 캐릭터들이 현대에 살면 어떨까요? AI가 진짜 보여줬습니다🏰\n\n라니스터 가문은 여전합니다. 타이윈은 저택 수영장에서 시가를 피우고, 조프리는 금색 람보르기니를 끌고 다",
+          "likes": 2042,
+          "comments": 54,
+          "video_plays": 130845,
+          "url": "https://www.instagram.com/p/DXNoRnYjzjo/"
+        },
+        {
+          "id": "3882049494162801778",
+          "type": "Video",
+          "timestamp": "2026-04-24T02:07:30.000Z",
+          "caption": "”당신은 어느 기숙사입니까?“ 🎩\n\n에트매거진에서 1, 2편을 연달아 소개했던 unhinderedstudios의 Dripwarts™ 시리즈, 이번 최신 편은 드디어 소팅햇이 등장하",
+          "likes": 3134,
+          "comments": 40,
+          "video_plays": 109525,
+          "url": "https://www.instagram.com/p/DXfz3JsDwRy/"
+        },
+        {
+          "id": "3877663289656673078",
+          "type": "Video",
+          "timestamp": "2026-04-18T00:53:47.000Z",
+          "caption": "사진 다시 찍자고 떼쓸 일이 없어졌습니다.📸\n\n중국 기업 화웨이가 곧 출시할 Pura 90 시리즈에 ’AI 포즈 추천‘ 기능을 공개했어요. 카메라 앱을 켜면 AI가 실시간으로 장면",
+          "likes": 814,
+          "comments": 10,
+          "video_plays": 86571,
+          "url": "https://www.instagram.com/p/DXQOjeajwM2/"
+        }
+      ]
+    },
+    "biggie_ai": {
+      "username": "biggie_ai",
+      "followers": 101550,
+      "following": null,
+      "biography": "🚀 AI 어렵지 않아요! 크리에이터가 쓰는 꿀팁 대공개\n⚡ 실생활에서 바로 쓰는 AI 트렌드, 1분이면 충분!\n💸 AI로 수익화 하는 방법\n📩 더 궁금한 팁, DM으로 물어보세요!",
+      "posts_scraped": 20,
+      "avg_likes": 1176.8,
+      "avg_comments": 2030.8,
+      "avg_video_plays": 25076.2,
+      "top_posts": [
+        {
+          "id": "3659753235688701642",
+          "type": "Video",
+          "timestamp": "2025-06-21T09:05:10.000Z",
+          "caption": "지금부터 당신은 햄스터 AI 영상을 제작합니다 📹\n\n최근 1,500만 조회수를 기록하며 \n전 세계를 사로잡은 동물 AI 콘텐츠, \n그 제작법을 오늘 전부 공개합니다\n\n먼저 Chat",
+          "likes": 10150,
+          "comments": 8669,
+          "video_plays": 135709,
+          "url": "https://www.instagram.com/p/DLKDi16z77K/"
+        },
+        {
+          "id": "3858099216238027078",
+          "type": "Video",
+          "timestamp": "2026-03-22T01:04:44.000Z",
+          "caption": "챗GPT가 좋을지, 제미나이가 좋을지, 클로드가 좋을지\n아직도 하나씩 비교하고 계시면 시간이 제일 많이 빠집니다.\n\n이제는 고르는 게 아니라\n역할을 나눠서 같이 쓰는 흐름이 더 빠",
+          "likes": 1901,
+          "comments": 4612,
+          "video_plays": 82503,
+          "url": "https://www.instagram.com/p/DWKuMvMFKFG/"
+        },
+        {
+          "id": "3645198944168593443",
+          "type": "Video",
+          "timestamp": "2025-06-01T07:08:29.000Z",
+          "caption": "“30초짜리 AI 영상으로 수천만 원 벌 수 있다면?” \n요즘 해외에선 이게 실제로 일어나고 있어요 👀\n\n귀여운 토끼 캐릭터가 나오는 AI 영상 하나가 \n2억 뷰를 넘기며 엄청난 ",
+          "likes": 4587,
+          "comments": 8516,
+          "video_plays": 66071,
+          "url": "https://www.instagram.com/p/DKWWSBqzEgj/"
+        },
+        {
+          "id": "3875858018558979968",
+          "type": "Video",
+          "timestamp": "2026-04-15T13:06:59.000Z",
+          "caption": "중국에 미쳐버린 AI가 등장했습니다 (댓글 남기시면 시댄스 프롬프트 가이드도 증정)\n\n바로 Seedance라는 영상 모델인데\n퀄리티가 뛰어난 건 물론이고\n\n말도 잘 알아듣고\n이미지",
+          "likes": 519,
+          "comments": 1341,
+          "video_plays": 23752,
+          "url": "https://www.instagram.com/p/DXJ0FUsDq-A/"
+        },
+        {
+          "id": "3871494986433474805",
+          "type": "Video",
+          "timestamp": "2026-04-09T12:39:07.000Z",
+          "caption": "여러분 저 AI를 입양(?)했습니다.\n이제 일 시키면 얘가 대신 합니다!\n\n제가드리는 프롬프트(PRD 문서)\n로 기본 공간과 작동 로직을 만들어주면\n알아서 움직이면서 처리합니다.\n",
+          "likes": 657,
+          "comments": 2990,
+          "video_plays": 19478,
+          "url": "https://www.instagram.com/p/DW6UC2YErD1/"
+        }
+      ]
+    },
+    "dy1.mag": {
+      "username": "dy1.mag",
+      "followers": 70098,
+      "following": null,
+      "biography": "👀 유익하고 흥미로운 AI 콘텐츠 큐레이션\n─\n📩 Contact : instagram@aifreaks.kr\n👇🏻 각종 링크 및 채용공고",
+      "posts_scraped": 5,
+      "avg_likes": 1315.0,
+      "avg_comments": 62.4,
+      "avg_video_plays": 0,
+      "top_posts": [
+        {
+          "id": "3859834727226979369",
+          "type": "Sidecar",
+          "timestamp": "2026-03-24T10:29:37.000Z",
+          "caption": "“에이전트 시대가 오면 세상이 어떻게 바뀔지. 평소 스쳐지나가던 생각들을 순서나 중요도 없이 떠오르는 대로 풀어놓은 것이다. 각 항목 끝의 퍼센트는 인공지능 모델이 독립적으로 제시",
+          "likes": 2615,
+          "comments": 23,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DWQ4zvwFLQp/"
+        },
+        {
+          "id": "3818595215929893662",
+          "type": "Sidecar",
+          "timestamp": "2026-01-26T12:54:04.000Z",
+          "caption": "미국 입장에서는 AI버블이라고 해도 솔직히 할 말 없는 것 같다. 몇 년 사이에 몇천억 짜리 회사들이 쏟아졌으니까. (한국하고 많이 다른 양상) \n\n미국은 기존 자본이 새로운 자산",
+          "likes": 2611,
+          "comments": 15,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DT-YB36geMe/"
+        },
+        {
+          "id": "3861169636432444690",
+          "type": "Sidecar",
+          "timestamp": "2026-03-26T06:41:50.000Z",
+          "caption": "Manus Pro. 정말 좋습니다. 말로 많이 떠드는 것 보다 직접 쓰는게 더 좋다고 생각합니다. 그런데, 유료입니다. \n\nManus 본사에서 지원해주셨습니다. 더 많은 한국 사용",
+          "likes": 1351,
+          "comments": 248,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DWVoVO1FH0S/"
+        },
+        {
+          "id": "3846507931914830019",
+          "type": "Sidecar",
+          "timestamp": "2026-03-06T01:11:39.000Z",
+          "caption": "중국은 하룻밤 사이에도 병원을 지어 올릴 만큼. 무언가를 현실로 만들어내는 속도가 공포스러울 정도로 빠릅니다.\n\n우리가 몇 년을 고민할 때, 중국은 이미 세상에 무언가를 만들고 있",
+          "likes": -1,
+          "comments": 24,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DVhipWbgYDD/"
+        },
+        {
+          "id": "3855262024493760611",
+          "type": "Sidecar",
+          "timestamp": "2026-03-18T03:04:28.000Z",
+          "caption": "”AI가 인간을 없애지 않는다. AI라는 도구를 끝내주게 활용하는 사람이 더 무서운 사람이다. 기술을 활용하는 사람들이 그렇지 못한 사람의 자리를 뺏어갈 것이다.“\n\n* 큐레이션 ",
+          "likes": -1,
+          "comments": 2,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DWApGKeAQBj/"
+        }
+      ]
+    },
+    "ai_freaks.kr": {
+      "username": "ai_freaks.kr",
+      "followers": 70098,
+      "following": null,
+      "biography": "👀 유익하고 흥미로운 AI 콘텐츠 큐레이션\n─\n📩 Contact : instagram@aifreaks.kr\n👇🏻 각종 링크 및 채용공고",
+      "posts_scraped": 15,
+      "avg_likes": 1714.7,
+      "avg_comments": 523.9,
+      "avg_video_plays": 0,
+      "top_posts": [
+        {
+          "id": "3845143619666380303",
+          "type": "Sidecar",
+          "timestamp": "2026-03-04T04:01:00.000Z",
+          "caption": "“클로드, AI 환승 기능 출시” 🧠\n\n‘클로드(@claudeai)‘가 메모리 가져오기(Import Memory) 기능을 추가했어요. 다른 AI에서 클로드로 갈아타도 처음부터 다시",
+          "likes": 5996,
+          "comments": 6032,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DVcsb_okwYP/"
+        },
+        {
+          "id": "3840272306447566005",
+          "type": "Sidecar",
+          "timestamp": "2026-02-25T10:42:35.000Z",
+          "caption": "“논란의 중심, Seedance 2.0 사례 모음” 🎬\n\n틱톡(@tiktok)의 모기업으로 잘 알려진 바이트댄스의 최신 AI 모델 ‘Seedance 2.0’이 SNS를 뜨겁게 달구",
+          "likes": 5331,
+          "comments": 83,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DVLY1Dqk8S1/"
+        },
+        {
+          "id": "3846713947605694808",
+          "type": "Sidecar",
+          "timestamp": "2026-03-06T08:00:58.000Z",
+          "caption": "”OpenAI, ‘GPT 5.4’ 출시“ 😎\n\n오늘 새벽, OpenAI(@openai)가 최신 플래그십 모델 ’GPT-5.4‘를 깜짝 출시했어요!\n\n추론, 코딩, 에이전트 워크플로",
+          "likes": 3515,
+          "comments": 74,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DViRfRfk_lY/"
+        },
+        {
+          "id": "3880831672703558699",
+          "type": "Sidecar",
+          "timestamp": "2026-04-22T09:46:48.000Z",
+          "caption": "”클로드 vs 구글, AI 디자인 1인자는?“ 🎨\n\n지난 4월 17일, 앤트로픽이 클로드 디자인을 공개하자 모든 커뮤니티에 해당 소식이 도배될 정도로 반응이 뜨거웠어요.\n\n그리고 ",
+          "likes": 1884,
+          "comments": 20,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXbe9hElKQr/"
+        },
+        {
+          "id": "3882190214035846076",
+          "type": "Sidecar",
+          "timestamp": "2026-04-24T06:45:59.000Z",
+          "caption": "“단 6주만에 돌아온 AI 최강자” 🧠\n\n오늘 새벽, 오픈AI가 GPT-5.5를 출시했어요. \n\n‘GPT-5.5’는 사용자가 뭘 하려는지 더 빠르게 파악하는 능력, 작업을 직접 처",
+          "likes": 1731,
+          "comments": 27,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DXgT25SGrO8/"
+        }
+      ]
+    },
+    "ai.favmag": {
+      "username": "ai.favmag",
+      "followers": 37204,
+      "following": null,
+      "biography": "AI Contents Curation \nAI 콘텐츠 큐레이션 매거진 \n✉️favaistudio@gmail.com",
+      "posts_scraped": 20,
+      "avg_likes": 1819.2,
+      "avg_comments": 256.4,
+      "avg_video_plays": 66729.2,
+      "top_posts": [
+        {
+          "id": "3876681746528484285",
+          "type": "Video",
+          "timestamp": "2026-04-16T16:23:11.000Z",
+          "caption": "거대한 예산? 이제 필요한 건 아이디어다. \n\nRunway(@runwayapp )가 공개한 ‘The Watch’ 영상이 큰 반응을 얻고 있습니다. 단 한 명의 크리에이터가 단 하루",
+          "likes": 19100,
+          "comments": 66,
+          "video_plays": 332453,
+          "url": "https://www.instagram.com/p/DXMvYJJEju9/"
+        },
+        {
+          "id": "3873646205654460815",
+          "type": "Video",
+          "timestamp": "2026-04-12T11:54:26.000Z",
+          "caption": "뜨거운 반응을 얻고 있는 3D 원피스 정상결전 \n\n크리에이터 西瓜君이 AI로 2D 원피스 애니메이션을 3D로 재탄생시켰습니다. 정상결전의 하이라이트, 능력자들의 전투가 완전히 새로",
+          "likes": 4024,
+          "comments": 64,
+          "video_plays": 159803,
+          "url": "https://www.instagram.com/p/DXB9LNZkumP/"
+        },
+        {
+          "id": "3867746289132375992",
+          "type": "Video",
+          "timestamp": "2026-04-04T08:33:28.000Z",
+          "caption": "미래의 넷플릭스 경쟁사는 힉스필드가 될까? \n#higgsfieldcreator #higgsfield #힉스필드 \n\n카메라도 스태프도 없이 완성된 영화 Arena Zero.  영상 ",
+          "likes": 1486,
+          "comments": 1983,
+          "video_plays": 111891,
+          "url": "https://www.instagram.com/p/DWs_sH9Eg-4/"
+        },
+        {
+          "id": "3862885945889184430",
+          "type": "Video",
+          "timestamp": "2026-03-28T15:34:40.000Z",
+          "caption": "내 공간에 롤러코스터 만들기? 이제 진짜 현실..!👀\n\nCoasterMania는 애플 (@apple ) 비전 프로와 메타 퀘스트 같은 공간 컴퓨팅 디바이스를 통해, 거실 한가운데에",
+          "likes": 970,
+          "comments": 5,
+          "video_plays": 89507,
+          "url": "https://www.instagram.com/p/DWbuk0kktqu/"
+        },
+        {
+          "id": "3875796899639492491",
+          "type": "Video",
+          "timestamp": "2026-04-15T11:06:21.000Z",
+          "caption": "2026년 AI 영화 제작은 더 이상 미래의 이야기가 아니다.\n#higgsfieldcreator #seedance2 #제작지원 \n\n@higgsfield.ai Seedance2.0 ",
+          "likes": 3646,
+          "comments": 187,
+          "video_plays": 81901,
+          "url": "https://www.instagram.com/p/DXJmL7Qkn-L/"
+        }
+      ]
+    },
+    "ai.saver_h": {
+      "username": "ai.saver_h",
+      "followers": null,
+      "following": null,
+      "biography": null,
+      "posts_scraped": 1,
+      "avg_likes": 0.0,
+      "avg_comments": 0.0,
+      "avg_video_plays": 0,
+      "top_posts": [
+        {
+          "id": null,
+          "type": null,
+          "timestamp": null,
+          "caption": "",
+          "likes": 0,
+          "comments": 0,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/ai.saver_h/"
+        }
+      ]
+    },
+    "ai.ainow": {
+      "username": "ai.ainow",
+      "followers": 92183,
+      "following": null,
+      "biography": "• 20만 AI 크리에이터 + 마케팅AX/AI 웹 개발/AI 교육 플랫폼 \n• @ai.ainow 23,272명 국내 최대 AI 커뮤니티 운영자\n• 사람이 일하지 않는 세상을 만들기 위해 일합니다.",
+      "posts_scraped": 18,
+      "avg_likes": 1344.8,
+      "avg_comments": 1010.8,
+      "avg_video_plays": 0,
+      "top_posts": [
+        {
+          "id": "3844701564276254452",
+          "type": "Sidecar",
+          "timestamp": "2026-03-03T13:22:43.000Z",
+          "caption": "💬샘 알트먼이 인도공대 학생들 앞에서\n이렇게 말했습니다.\n\n”내 1살짜리 아들은 자기가 컴퓨터보다\n똑똑했던 세상을 절대 모를 겁니다.“\n\n지능의 비용이 18개월 만에\n1,000배 ",
+          "likes": 6199,
+          "comments": 3109,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DVbH7PeEyb0/"
+        },
+        {
+          "id": "3838755154330646660",
+          "type": "Sidecar",
+          "timestamp": "2026-02-23T08:28:16.000Z",
+          "caption": "💬 앤트로픽 CEO가 말했습니다.\n\n\"이전의 변화는 수세기에 걸쳐 일어났다.\n이번은 한 자릿수 '년' 안에 일어난다.\"\n\n3,500억 달러 가치의 AI 기업을 이끄는 사람이\n직접 ",
+          "likes": 3252,
+          "comments": 2450,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DVF_3lpk_iE/"
+        },
+        {
+          "id": "3852568747316590424",
+          "type": "Sidecar",
+          "timestamp": "2026-03-14T09:53:25.000Z",
+          "caption": "🤖 9억 명이 쓰는 AI를 만든 사람이\n이렇게 말했습니다.\n\n”여러분이 걱정해야 할 건\n일자리가 아닙니다.\n더 큰 게 바뀌고 있습니다.“\n\n2028년 말,\n데이터센터 안의 지능이\n",
+          "likes": 3188,
+          "comments": 3450,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DV3Et0ok7dY/"
+        },
+        {
+          "id": "3856176552384598665",
+          "type": "Sidecar",
+          "timestamp": "2026-03-19T09:21:28.000Z",
+          "caption": "🔥클로드(Claude)를 만드는 회사의\n디자인 총괄이 이렇게 말했습니다.\n\n”디자이너들이 복음처럼 따르던\n그 프로세스.\n기본적으로 죽었습니다.“\n\n몇 년 전만 해도\n업무의 60~7",
+          "likes": 2289,
+          "comments": 1844,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DWD5CS8ExKJ/"
+        },
+        {
+          "id": "3864148567011180756",
+          "type": "Sidecar",
+          "timestamp": "2026-03-30T09:20:27.000Z",
+          "caption": "💰9개월 만에 매출 2,700억원\nSlack보다, Zoom보다 빠른 성장.\n\n이 AI 회사 CEO한테 물어봤습니다.\n\n”처음부터 다시 시작하면\n어떻게 하실 건가요?“\n\n답이 충격적",
+          "likes": 1595,
+          "comments": 972,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DWgNqYICUDU/"
+        }
+      ]
+    },
+    "thisiskeepkwan": {
+      "username": "thisiskeepkwan",
+      "followers": 35207,
+      "following": null,
+      "biography": "🇰🇷𝐊𝗘𝗘𝐏 𝗧𝐇𝗘 𝐇𝗘𝗥𝗜𝗧𝐀𝐆𝗘\n🤖𝐒𝐇𝗜𝐅𝗧 𝗧𝐇𝗘 𝐅𝗥𝐀𝐌𝗘\n📧thisiskeepkwan@gmail.com",
+      "posts_scraped": 18,
+      "avg_likes": 4347.0,
+      "avg_comments": 43.1,
+      "avg_video_plays": 5432.5,
+      "top_posts": [
+        {
+          "id": "3851918553709733473",
+          "type": "Sidecar",
+          "timestamp": "2026-03-13T12:21:35.000Z",
+          "caption": "What if? 광화문에서 함께 부르는 노래 💜🎤\n\n3월 21일, 광화문광장에서 열리는 BTS 콘서트.\n한복을 입은 사람들, 세계의 관객들,\n시간과 공간을 뛰어넘어 모든 사람들이\n",
+          "likes": 57597,
+          "comments": 131,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DV0w4QpmuZh/"
+        },
+        {
+          "id": "3848941004331332490",
+          "type": "Sidecar",
+          "timestamp": "2026-03-09T09:37:07.000Z",
+          "caption": "What if? 조선시대에 지하철이 다닌다면? 🚆\n\n서울의 지하철이 옛 시간과 만난다면 어떤 풍경이 펼쳐질까요?\n손잡이는 작은 흑립갓이 되고, \n승객들은 한복을 입은 채 열차에 오",
+          "likes": 10792,
+          "comments": 313,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DVqL3NsmrOK/"
+        },
+        {
+          "id": "3861308512790460388",
+          "type": "Video",
+          "timestamp": "2026-03-26T11:20:05.000Z",
+          "caption": "BTS - SWIM 🔴🔴🔴\n🏊🏻‍♂️🏊🏻🏊🏻‍♀️🏊🏻🏊🏻‍♀️🏊🏻‍♂️🏊🏻\nKEEP SWIMMING\n\n• Created in collaboration with AI\n• by KEE",
+          "likes": 808,
+          "comments": 17,
+          "video_plays": 7900,
+          "url": "https://www.instagram.com/p/DWWH6JhETfk/"
+        },
+        {
+          "id": "3867100481349288482",
+          "type": "Video",
+          "timestamp": "2026-04-03T11:07:28.000Z",
+          "caption": "What if? 아기 범 내려온다🐯\n범 내려온다\n갓을 쓴 아기 범이 아빠 엄마 찾으러 온다\n\n범이 내려온다.\n장림깊은 골로 대한 아기짐승이 내려온다.\n\nThe tiger desce",
+          "likes": -1,
+          "comments": 12,
+          "video_plays": 2965,
+          "url": "https://www.instagram.com/p/DWqs2YlkQIi/"
+        },
+        {
+          "id": "3866335297013959399",
+          "type": "Sidecar",
+          "timestamp": "2026-04-02T09:26:22.000Z",
+          "caption": "What if? 서울국제정원박람회 K-heritage🌲🇰🇷\n\n다가오는 5월, 서울숲에서 서울국제정원박람회가 열립니다.\n\n이번엔 AI와 함께 이런 상상을 해봤어요\n\n낮에는 연꽃이 도",
+          "likes": 2251,
+          "comments": 40,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DWn-3fJEkrn/"
+        }
+      ]
+    },
+    "ai.yeongseon": {
+      "username": "ai.yeongseon",
+      "followers": 92183,
+      "following": null,
+      "biography": "• 20만 AI 크리에이터 + 마케팅AX/AI 웹 개발/AI 교육 플랫폼 \n• @ai.ainow 23,272명 국내 최대 AI 커뮤니티 운영자\n• 사람이 일하지 않는 세상을 만들기 위해 일합니다.",
+      "posts_scraped": 2,
+      "avg_likes": 139.5,
+      "avg_comments": 10.0,
+      "avg_video_plays": 0,
+      "top_posts": [
+        {
+          "id": "3722325323079176618",
+          "type": "Sidecar",
+          "timestamp": "2025-09-15T17:02:58.000Z",
+          "caption": "EP.01 : 과거와 현재\n\n안녕하세요. 신영선입니다. \n\n9.4만 인플루언서, 1.3만 유튜버, 5년차 콘텐츠 에이전시와 뷰티 브랜드, AI 플랫폼 대표라는 타이틀을 잠시 내려놓",
+          "likes": 201,
+          "comments": 14,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DOoWyjck1Gq/"
+        },
+        {
+          "id": "3785988853376176822",
+          "type": "Image",
+          "timestamp": "2025-12-12T13:11:03.000Z",
+          "caption": "첫 번째 수제자 프로젝트의 결말\n\n올해 8월, 저는 'AI 크리에이터가 되는 방법'을 직접 전수하는 수제자 프로젝트를 시작했습니다.\n\n53명이 지원했고, 그중 6명을 선정했습니다.",
+          "likes": 78,
+          "comments": 6,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DSKiM2ZE1K2/"
+        }
+      ]
+    },
+    "brivvy_ai": {
+      "username": "brivvy_ai",
+      "followers": 57875,
+      "following": null,
+      "biography": "▪️매달 5000개 이미지·영상 제작 경험에서 나온 노하우\n▪️AI 콘텐츠 실전 스킬을 가장 빠르게 배우는 공간\n▪️힉스필드AI 공식 엠버서더\n↓ 더 유익한 정보 & 협업 문의 ↓",
+      "posts_scraped": 20,
+      "avg_likes": 874.1,
+      "avg_comments": 3962.7,
+      "avg_video_plays": 46953.2,
+      "top_posts": [
+        {
+          "id": "3770814695289592314",
+          "type": "Video",
+          "timestamp": "2025-11-21T14:45:14.000Z",
+          "caption": "성능이 정말 압도적입니다😱😱\n\n핵심만 빠르게 알려드릴게요.\n\nAI 이미지의 가장 큰 문제였던 텍스트 오류가 거의 해결됐고,\n이제는 프롬프트 한 줄로\n타이포그래피, 포스터, 썸네일,",
+          "likes": 3044,
+          "comments": 13513,
+          "video_plays": 173937,
+          "url": "https://www.instagram.com/p/DRUn_yajxn6/"
+        },
+        {
+          "id": "3774370928932141201",
+          "type": "Video",
+          "timestamp": "2025-11-26T12:35:04.000Z",
+          "caption": "나노바나나Pro 3개월 무료 사용법 공개‼️\n\n지금 제일 뜨거운 수익화 기회는 AI 인플루언서예요.\n해외는 이미 얼굴 공개 없이 AI 인플루언서 만들어\n큰 수익 내는 사람들이 많습",
+          "likes": 3410,
+          "comments": 21293,
+          "video_plays": 168834,
+          "url": "https://www.instagram.com/p/DRhQlzFj7iR/"
+        },
+        {
+          "id": "3856341988283449939",
+          "type": "Video",
+          "timestamp": "2026-03-19T14:50:47.000Z",
+          "caption": "무료 프롬프트팩과 상세 가이드 받아 가세요👇\n\n아무 댓글이나 남겨 주시면\n리얼리티 프롬프트 올인원 팩을 보내드릴게요!\n\n🔥총 11개의 이미지 + 영상 프롬프트와\n상세 가이드 정리본",
+          "likes": 1924,
+          "comments": 12382,
+          "video_plays": 138567,
+          "url": "https://www.instagram.com/p/DWEeptIDwJT/"
+        },
+        {
+          "id": "3864269184868235107",
+          "type": "Video",
+          "timestamp": "2026-03-30T13:21:05.000Z",
+          "caption": "무료 리얼리티 프롬프트 팩 받아 가세요‼️\n\n리얼리티 프롬프트 팩 1편을\n많은 분들이 좋아해 주셔서 2편도 준비했습니다!\n\n디테일한 고퀄리티 인물 사진과 영상을 만들 수 있는\n프롬",
+          "likes": 1209,
+          "comments": 6879,
+          "video_plays": 136662,
+          "url": "https://www.instagram.com/p/DWgpFmQjzdj/"
+        },
+        {
+          "id": "3777331790970068808",
+          "type": "Video",
+          "timestamp": "2025-11-30T14:35:23.000Z",
+          "caption": "프롬프트 이렇게 쓰시면 절대 안됩니다‼️\n\nAI 이미지 퀄리티가 아쉽다면\n툴의 문제보다 ‘프롬프트’가 문제일 확률이 더 큽니다.\n\n대충 적은 문장은 AI가 추측해서 빈 부분을 채우",
+          "likes": 3307,
+          "comments": 14301,
+          "video_plays": 85658,
+          "url": "https://www.instagram.com/p/DRrx0Avj59I/"
+        }
+      ]
+    },
+    "artart.today": {
+      "username": "artart.today",
+      "followers": 35207,
+      "following": null,
+      "biography": "🇰🇷𝐊𝗘𝗘𝐏 𝗧𝐇𝗘 𝐇𝗘𝗥𝗜𝗧𝐀𝐆𝗘\n🤖𝐒𝐇𝗜𝐅𝗧 𝗧𝐇𝗘 𝐅𝗥𝐀𝐌𝗘\n📧thisiskeepkwan@gmail.com",
+      "posts_scraped": 2,
+      "avg_likes": 260.5,
+      "avg_comments": 53.5,
+      "avg_video_plays": 10581.5,
+      "top_posts": [
+        {
+          "id": "3856171551440329063",
+          "type": "Video",
+          "timestamp": "2026-03-19T09:12:55.000Z",
+          "caption": "SM을 퇴사하고 AI 아티스트로 🤖\nSM엔터테인먼트에서 사업전략과 마케팅을 담당하던 킵콴 작가는  엔터 비즈니스 최전선에서 커리어를 쌓은 뒤, 생성형 AI를 매개로 한 크리에이티브",
+          "likes": 295,
+          "comments": 60,
+          "video_plays": 14073,
+          "url": "https://www.instagram.com/p/DWD35hckVln/"
+        },
+        {
+          "id": "3855467816762316917",
+          "type": "Video",
+          "timestamp": "2026-03-18T09:54:32.000Z",
+          "caption": "문화와 테크를 잇는 AI 아티스트 🤖🎨 킵콴(Kip Kwan)\n\nSM 엔터테인먼트에서 커리어를 쌓던 그는 출장 중, 한복을 ‘차이니스 기모노’로 표기한 장면을 우연히 보게 된 일을",
+          "likes": 226,
+          "comments": 47,
+          "video_plays": 7090,
+          "url": "https://www.instagram.com/p/DWBX41dEZh1/"
+        }
+      ]
+    },
+    "ai_dori_": {
+      "username": "ai_dori_",
+      "followers": 101428,
+      "following": null,
+      "biography": "🎸 쏟아져내리는 다양한 AI 툴들, 대신 써보고 알려드려요!\n🎸 최고로 하드락한 디자이너가 되고 싶습니다.\n🎸 Genspark AI 공식 앰버서더 2025",
+      "posts_scraped": 20,
+      "avg_likes": 7292.9,
+      "avg_comments": 1435.8,
+      "avg_video_plays": 182998.4,
+      "top_posts": [
+        {
+          "id": "3788745840715328906",
+          "type": "Video",
+          "timestamp": "2025-12-16T08:30:51.000Z",
+          "caption": "나노바나나 pro 모르면 진짜 안되는 기능 ❌\n👉 Higgsfield에서 인페인트 기능 엄청 간편하게 쓸 수 있다!! @higgsfield.ai (제작지원)\n\n원하는 부분만 딱 짚",
+          "likes": 18055,
+          "comments": 19338,
+          "video_plays": 821314,
+          "url": "https://www.instagram.com/p/DSUVES8E22K/"
+        },
+        {
+          "id": "3855476896910478229",
+          "type": "Video",
+          "timestamp": "2026-03-18T10:19:21.000Z",
+          "caption": "🎬스토리보드-AI 영상화 워크플로우 (제작지원 @higgsfield.ai )\n\n항상 느끼지만 의도대로 AI를 다룬다는게 참 어려운 것 같아요. \n정답이 없기 때문에 늘 이것저것 시",
+          "likes": 26116,
+          "comments": 109,
+          "video_plays": 638581,
+          "url": "https://www.instagram.com/p/DWBZ8-AEwuV/"
+        },
+        {
+          "id": "3851088225239267982",
+          "type": "Video",
+          "timestamp": "2026-03-12T08:52:35.000Z",
+          "caption": "🍀피그마에서도 이런 AI 쓸 수 있어…! (제작지원 @oplux.ai )\n\n바로 Oplux라는 플러그인!! 원래 포토샵에만 있던 플러그인인데 이번에 피그마에도 런칭됐음! \n\n얼굴 ",
+          "likes": 35756,
+          "comments": 98,
+          "video_plays": 560923,
+          "url": "https://www.instagram.com/p/DVx0FZAE3qO/"
+        },
+        {
+          "id": "3759790958272834368",
+          "type": "Video",
+          "timestamp": "2025-11-06T09:40:54.000Z",
+          "caption": "광고ㅣ이커머스 종사자라면, 꼭 알아야하는 AI ➡️ 바로 Pic Copilot 입니다 :)   정말 고퀄리티 모델 이미지가 많아서, 제품 사진 하나만 있으면 누구나 쉽게 제품을 인",
+          "likes": 23735,
+          "comments": 2550,
+          "video_plays": 528468,
+          "url": "https://www.instagram.com/p/DQtdfTRk-tA/"
+        },
+        {
+          "id": "3831645840138782387",
+          "type": "Video",
+          "timestamp": "2026-02-13T13:04:26.000Z",
+          "caption": "이제 모션디자인까지 AI 진입 시작함 ㄷㄷ (제작지원 @higgsfield.ai )\n\n바로 힉스필드의 Vibe Motion 기능임!! \n프롬프트와 레퍼런스 이미지만 있으면\n인포그래",
+          "likes": 5004,
+          "comments": 195,
+          "video_plays": 127775,
+          "url": "https://www.instagram.com/p/DUsvZc2k0az/"
+        }
+      ]
+    },
+    "fastcampus": {
+      "username": "fastcampus",
+      "followers": 45500,
+      "following": null,
+      "biography": "🍭한입에 쏙 들어오는 AI 이슈\n📝쉽고 재밌는 테크 매거진⚡️\n💌뉴스레터는 ⬇️프로필 링크로⬇️",
+      "posts_scraped": 1,
+      "avg_likes": 29.0,
+      "avg_comments": 111.0,
+      "avg_video_plays": 2197.0,
+      "top_posts": [
+        {
+          "id": "3803952408187451777",
+          "type": "Video",
+          "timestamp": "2026-01-06T08:01:59.000Z",
+          "caption": "🚨 [2주 한정] 제작비 10억 넘는 강의, 전부 무료!\nAI, 투자, 수익화… 평소에 비싸서 못 듣던 강의, 딱 2주만 0원에 푼대! (벌써 8천 명 넘게 신청함 🔥)\n\n✅ 댓글",
+          "likes": 29,
+          "comments": 111,
+          "video_plays": 2197,
+          "url": "https://www.instagram.com/p/DTKWo-ggTmB/"
+        }
+      ]
+    },
+    "ai_ing_": {
+      "username": "ai_ing_",
+      "followers": 45500,
+      "following": null,
+      "biography": "🍭한입에 쏙 들어오는 AI 이슈\n📝쉽고 재밌는 테크 매거진⚡️\n💌뉴스레터는 ⬇️프로필 링크로⬇️",
+      "posts_scraped": 19,
+      "avg_likes": 4143.9,
+      "avg_comments": 67.5,
+      "avg_video_plays": 735126.5,
+      "top_posts": [
+        {
+          "id": "3572782439670254075",
+          "type": "Video",
+          "timestamp": "2025-02-21T09:08:25.000Z",
+          "caption": "해리포터 전기차 등장🔥\n\n‼️미국 스타트업이 일 냈다!\n\n알레프 에어로노틱스라는 회사가 \n최근 플라잉카 ‘모델 에이’(A)의 비행 영상을 공개해서 화제야.\n\n🧙영화 해리포터의 한 ",
+          "likes": 70068,
+          "comments": 960,
+          "video_plays": 1465257,
+          "url": "https://www.instagram.com/p/DGVErMQTIn7/"
+        },
+        {
+          "id": "3748157176104959049",
+          "type": "Video",
+          "timestamp": "2025-10-21T08:27:32.000Z",
+          "caption": "SNS는 시간 낭비? ㄴㄴ, 걍 괴물임\n\n덴마크 정보가 만 15세 미만 청소년들의 SNS 사용 금지법을 추진할 예정이야. 얼마 전에 덴마크는, 초등학교 내에서 학생들의 스마트폰 사",
+          "likes": 99,
+          "comments": 2,
+          "video_plays": 4996,
+          "url": "https://www.instagram.com/p/DQEIRfUETxJ/"
+        },
+        {
+          "id": "3702559863185211563",
+          "type": "Sidecar",
+          "timestamp": "2025-08-19T10:32:32.000Z",
+          "caption": "⚡️AI 때문에 이공계 취업 하락, 문과생 뜨는 중\n\nAI 열풍에 컴공 졸업해도 취업이 잘 되지 않고 있대🥲\n\n왜냐고? \nAI가 하도 똑똑하니까 빅테크 마저도 신입 채용을 줄이고 ",
+          "likes": 4676,
+          "comments": 98,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DNiIpQcxgCr/"
+        },
+        {
+          "id": "3550319786389695218",
+          "type": "Sidecar",
+          "timestamp": "2025-01-21T09:18:41.000Z",
+          "caption": "쿠팡이 왜 여깄어??\n\n.\n.\n.\n.\n\n#트럼프취임식 \n#트럼프 \n#테크 #테크트렌드\n#일론머스크 #마크저커버그",
+          "likes": 1169,
+          "comments": 18,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DFFRQkKzGry/"
+        },
+        {
+          "id": "3828059440315321805",
+          "type": "Image",
+          "timestamp": "2026-02-08T14:18:23.000Z",
+          "caption": ".....?\n\n욕 먹어도 싸다 너는 ㅋㅋㅋ\n.\n.\n.\n.\n#챗gpt",
+          "likes": 535,
+          "comments": 0,
+          "video_plays": 0,
+          "url": "https://www.instagram.com/p/DUf_8dvE03N/"
+        }
+      ]
+    }
+  }
+}
