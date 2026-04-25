@@ -29,4 +29,10 @@
 
 ---
 
+### AI 자동화 설계
+
+- **[2026-04-25] MISTAKE** 자동화 파이프라인 설명 시 AI 아바타(HeyGen)를 캐러셀과 혼동해서 언급. AI 아바타는 **릴스 전용**이고, 캐러셀은 **Canva Bulk Create(CSV)** 방식. 두 포맷의 도구를 절대 혼동하지 않는다.
+  - 릴스 → HeyGen(AI 아바타) → 캡컷 후편집
+  - 캐러셀 → Claude(carousel-script) → CSV → Canva Bulk Create
+
 _실수하거나 발견한 인사이트는 여기에 추가하세요._
