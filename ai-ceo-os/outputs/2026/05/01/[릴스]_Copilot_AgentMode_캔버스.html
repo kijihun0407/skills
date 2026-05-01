@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Copilot Agent Mode — 1080×1920 HQ v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#07070f; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; gap:14px; padding:20px; }
+.preview-wrap { width:405px; height:720px; position:relative; overflow:hidden; border-radius:14px; box-shadow:0 8px 48px rgba(0,120,212,.3); }
+canvas#reel { width:1080px; height:1920px; transform:scale(0.375); transform-origin:top left; display:block; }
+.badge { position:absolute; top:8px; right:8px; background:rgba(0,120,212,.9); color:#fff; font-family:'Noto Sans KR',sans-serif; font-size:10px; font-weight:700; padding:3px 10px; border-radius:10px; pointer-events:none; }
+
+.controls { display:flex; gap:10px; }
+button { font-family:'Noto Sans KR',sans-serif; font-size:13px; font-weight:700; padding:9px 22px; border-radius:22px; border:none; cursor:pointer; }
+.btn-play { background:#fff; color:#000; }
+.btn-rec  { background:linear-gradient(135deg,#0078D4,#005a9e); color:#fff; box-shadow:0 4px 18px rgba(0,120,212,.5); }
+.btn-rec:disabled { opacity:.4; cursor:not-allowed; }
+.info { font-family:'Noto Sans KR',sans-serif; font-size:11px; color:rgba(255,255,255,.4); text-align:center; line-height:1.8; }
+
+/* 화면녹화 파일 드롭 안내 */
+.drop-zone { border:1.5px dashed rgba(255,255,255,.15); border-radius:10px; padding:12px 20px; font-family:'Noto Sans KR',sans-serif; font-size:11px; color:rgba(255,255,255,.35); text-align:center; line-height:1.8; max-width:405px; }
+</style>
+</head>
+<body>
+
+<div class="preview-wrap" id="wrap">
+  <canvas id="reel" width="1080" height="1920"></canvas>
+
+</div>
+
+<div class="controls">
+  <button class="btn-play" onclick="startPreview()">▶ 미리보기</button>
+  <button class="btn-rec" id="btnRec" onclick="startRecord()">📥 고화질 녹화</button>
+</div>
+
+<div class="info">
+  canvas.captureStream(30) · 8Mbps VP9 · 화면공유 없음<br>
+  30초 완료 후 자동 저장: copilot_agent_mode_1080x1920.webm
+</div>
+
+<div class="drop-zone">
+  📁 화면녹화 파일을 이 폴더에 저장 후 미리보기 재시작<br>
+  <b>excel_demo.mp4</b> · <b>word_demo.mp4</b> · <b>ppt_demo.mp4</b>
+</div>
+
+<!-- 코파일럿 로고 이미지 -->
+<img id="imgCopilotLogo" src="copilot_logo.png" style="display:none">
+<!-- 화면녹화 비디오 요소 (숨김) -->
+<video id="vid-excel" src="excel_demo.mov" muted playsinline preload="auto" style="display:none"></video>
+<video id="vid-word"  src="word_demo.mov"  muted playsinline preload="auto" style="display:none"></video>
+<video id="vid-ppt"   src="ppt_demo.mov"   muted playsinline preload="auto" style="display:none"></video>
+<!-- 결과 이미지 (숨김) -->
+<img id="img1" src="1.png" style="display:none">
+<img id="img2" src="2.png" style="display:none">
+<img id="img3" src="3.png" style="display:none">
+<img id="img4" src="4.png" style="display:none">
+
+<script>
+/* ══════════════════════════════════════════════
+   기본 설정
+══════════════════════════════════════════════ */
+const W=1080, H=1920, TOTAL=36000, FPS=30, BITRATE=8_000_000;
+const canvas=document.getElementById('reel');
+const ctx=canvas.getContext('2d');
+
+/* 비디오 요소 */
+const vidExcel=document.getElementById('vid-excel');
+const vidWord =document.getElementById('vid-word');
+const vidPpt  =document.getElementById('vid-ppt');
+
+/* 코파일럿 로고 */
+const imgCopilotLogo=document.getElementById('imgCopilotLogo');
+
+/* 결과 이미지 요소 */
+const img1=document.getElementById('img1');
+const img2=document.getElementById('img2');
+const img3=document.getElementById('img3');
+const img4=document.getElementById('img4');
+
+/* 비디오 로드 상태 */
+const vidReady={excel:false,word:false,ppt:false};
+vidExcel.addEventListener('canplay',()=>vidReady.excel=true);
+vidWord .addEventListener('canplay',()=>vidReady.word=true);
+vidPpt  .addEventListener('canplay',()=>vidReady.ppt=true);
+
+let animFrame=null, startTime=null, isRec=false;
+
+/* ══════════════════════════════════════════════
+   유틸
+══════════════════════════════════════════════ */
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+const lerp=(a,b,t)=>a+(b-a)*clamp(t,0,1);
+const easeOut=t=>1-(1-clamp(t,0,1))**2.5;
+const easeIn =t=>clamp(t,0,1)**2;
+const snap   =t=>{ t=clamp(t,0,1); return t<.5?2*t*t:-1+(4-2*t)*t; };
+
+function rr(x,y,w,h,r,fill,stroke,sw=2){
+  ctx.beginPath(); ctx.roundRect(x,y,w,h,r);
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke();}
+}
+function t(text,x,y,sz,color,align='center',wt='900'){
+  ctx.font=`${wt} ${sz}px 'Noto Sans KR',sans-serif`;
+  ctx.fillStyle=color; ctx.textAlign=align; ctx.textBaseline='middle';
+  ctx.fillText(text,x,y);
+}
+function sh(c,b){ctx.shadowColor=c;ctx.shadowBlur=b;}
+function nsh(){ctx.shadowColor='transparent';ctx.shadowBlur=0;}
+
+/* ══════════════════════════════════════════════
+   파티클
+══════════════════════════════════════════════ */
+const PC=['#0078D4','#4FC3F7','#fff','#81D4FA','#B3E5FC'];
+let pts=[];
+const newPt=()=>({x:Math.random()*W,y:H+10+Math.random()*200,vy:-(1.5+Math.random()*2.5),r:2+Math.random()*4,op:0,maxOp:.1+Math.random()*.35,c:PC[~~(Math.random()*PC.length)]});
+const initPts=()=>{pts=Array.from({length:28},newPt);};
+function tickPts(){pts.forEach(p=>{p.y+=p.vy;p.op=Math.min(p.maxOp,p.op+.018);if(p.y<-20)Object.assign(p,newPt());});}
+function drawPts(){pts.forEach(p=>{ctx.globalAlpha=p.op;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill();});ctx.globalAlpha=1;}
+
+/* ══════════════════════════════════════════════
+   Copilot 로고 (캔버스 직접 드로잉)
+   공식 컬러: #199fd7 #fc7942 #99bd3c #8a50d8
+══════════════════════════════════════════════ */
+function drawCopilotLogo(cx,cy,size,alpha=1){
+  ctx.save(); ctx.translate(cx,cy); ctx.globalAlpha=alpha;
+  const r=size*.42, lw=size*.09;
+  const rot=Date.now()/4000;
+  const cols=['#199fd7','#fc7942','#99bd3c','#8a50d8'];
+  const angles=[0,Math.PI/2,Math.PI,Math.PI*1.5];
+
+  angles.forEach((a,i)=>{
+    ctx.beginPath();
+    ctx.arc(0,0,r,a+rot,a+rot+Math.PI*.65);
+    ctx.strokeStyle=cols[i];
+    ctx.lineWidth=lw;
+    ctx.lineCap='round';
+    sh(cols[i],size*.18);
+    ctx.stroke();
+    nsh();
+  });
+
+  /* 중심 원 */
+  ctx.beginPath(); ctx.arc(0,0,size*.1,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fill();
+  ctx.restore(); ctx.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════════
+   배경 그라디언트
+══════════════════════════════════════════════ */
+function bg(c1,c2,c3=''){
+  const g=ctx.createLinearGradient(0,0,W*.45,H);
+  g.addColorStop(0,c1); g.addColorStop(.5,c2); g.addColorStop(1,c3||c1);
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+}
+
+/* ══════════════════════════════════════════════
+   공통 고정 레이어
+══════════════════════════════════════════════ */
+function drawTopBar(a){
+  ctx.globalAlpha=a;
+  const lb='📱 @ai.saver_';
+  ctx.font=`700 34px 'Noto Sans KR',sans-serif`;
+  const tw=ctx.measureText(lb).width;
+  const bw=tw+86,bh=64,bx=W/2-bw/2,by=44;
+  rr(bx,by,bw,bh,32,'rgba(0,0,0,.65)','rgba(255,255,255,.2)',2);
+  t(lb,W/2,by+bh/2,34,'#fff','center','700');
+  ctx.globalAlpha=1;
+}
+
+function drawProgress(p){
+  ctx.fillStyle='rgba(255,255,255,.9)';
+  ctx.fillRect(0,H-7,W*p,7);
+}
+
+function drawPersistentSub(el){ /* 자막 제거됨 */ }
+
+/* ══════════════════════════════════════════════
+   씬 1: 오프닝 (0~3s) — 속도 UP
+══════════════════════════════════════════════ */
+function drawOpening(el){
+  const p=el/2000;
+  const fi=easeOut(clamp(p*3,0,1));
+
+  /* 아이보리 배경 */
+  ctx.fillStyle='#F5F0E8'; ctx.fillRect(0,0,W,H);
+
+  /* 코파일럿 로고 — 전체 화면 커버 */
+  if(imgCopilotLogo.complete && imgCopilotLogo.naturalWidth > 0){
+    ctx.globalAlpha = Math.min(fi, 1);
+    ctx.drawImage(imgCopilotLogo, 0, 0, W, H);
+    ctx.globalAlpha = 1;
+  } else {
+    drawCopilotLogo(W/2, H*.44, 860, 0.22*fi+0.06);
+  }
+
+  /* 은빛 shimmer 스윕 — 로고 위를 대각선으로 가로지르는 광택 */
+  const shimT = (Date.now() % 2400) / 2400; // 2.4초 주기 반복
+  const shimX = lerp(-W*0.6, W*1.6, shimT);
+  const shimG = ctx.createLinearGradient(shimX - 300, 0, shimX + 300, H);
+  shimG.addColorStop(0,   'rgba(255,255,255,0)');
+  shimG.addColorStop(0.4, 'rgba(255,255,255,0)');
+  shimG.addColorStop(0.5, `rgba(255,255,255,${0.32 * fi})`);
+  shimG.addColorStop(0.6, 'rgba(255,255,255,0)');
+  shimG.addColorStop(1,   'rgba(255,255,255,0)');
+  ctx.fillStyle = shimG;
+  ctx.fillRect(0, 0, W, H);
+
+  /* 반짝이는 은빛 파티클 (오프닝 전용) */
+  const now = Date.now();
+  for(let i=0; i<18; i++){
+    const seed = i * 137.508;
+    const px = (Math.sin(seed) * 0.5 + 0.5) * W;
+    const py = (Math.cos(seed * 1.3) * 0.5 + 0.5) * H;
+    const pulse = Math.abs(Math.sin(now / 600 + seed));
+    const sz = 2 + pulse * 5;
+    ctx.globalAlpha = pulse * 0.55 * fi;
+    const sg = ctx.createRadialGradient(px, py, 0, px, py, sz * 3);
+    sg.addColorStop(0, 'rgba(255,255,255,1)');
+    sg.addColorStop(0.4, 'rgba(220,230,255,0.6)');
+    sg.addColorStop(1, 'rgba(180,200,255,0)');
+    ctx.fillStyle = sg;
+    ctx.beginPath(); ctx.arc(px, py, sz * 3, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  /* 전경 텍스트 */
+  ctx.globalAlpha=fi;
+
+  /* MICROSOFT 레이블 */
+  t('MICROSOFT',W/2,H*.30,42,'rgba(0,100,180,.55)','center','700');
+
+  /* 타이틀 */
+  t('Copilot',   W/2,H*.40,140,'#0078D4','center','900');
+  t('Agent Mode',W/2,H*.50,108,'#111',   'center','900');
+
+  ctx.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════════
+   씬 2: 발표 (3~6s) — 단축 + 속도 UP
+══════════════════════════════════════════════ */
+function drawAnnounce(el){
+  const p=el/2000;
+  ctx.fillStyle='#F5F0E8'; ctx.fillRect(0,0,W,H);
+
+  const sc=lerp(.86,1,easeOut(p*4));
+  ctx.save(); ctx.translate(W/2,H/2); ctx.scale(sc,sc);
+
+  ctx.globalAlpha=clamp(p*8,0,1);
+  const bt='⚡ 정식 출시';
+  ctx.font=`800 40px 'Noto Sans KR',sans-serif`;
+  const btw=ctx.measureText(bt).width;
+  rr(-btw/2-54,-410,btw+108,76,38,'#0078D4',null);
+  sh('rgba(0,120,212,.7)',22); t(bt,0,-372,40,'#fff','center','800'); nsh();
+  ctx.globalAlpha=1;
+
+  ctx.globalAlpha=clamp(p*6,0,1);
+  t('4월 22일 · Microsoft 365',0,-306,36,'rgba(0,0,0,.45)','center','700');
+  ctx.globalAlpha=1;
+
+  ctx.globalAlpha=clamp(p*5,0,1);
+  t('Word · Excel · PPT에', 0,-160,88,'#111',   'center','900');
+  t('AI 에이전트가',        0,-48, 88,'#0078D4','center','900');
+  t('들어왔습니다',         0, 80, 88,'#111',   'center','900');
+  ctx.globalAlpha=1;
+
+  ctx.globalAlpha=clamp((p-.25)*5,0,1);
+  t('이제 AI가 직접 작업합니다',0,210,48,'rgba(0,0,0,.55)','center','700');
+  ctx.globalAlpha=1;
+
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════════
+   씬 3~5: 풀스크린 데모 (각 3.5s)
+   Excel: 4~7.5s / Word: 7.5~11s / PPT: 11~14.5s
+══════════════════════════════════════════════ */
+function drawVideoFullscreen(el, vEl, vReady, appName, label, desc, accentColor, dur, resultImgs, zoomRegion, resultScale=1.0){
+  const VH = Math.round(H*0.72); // 상단 72% 높이 (~1382px)
+  const TY = VH;
+  const BH = H - VH;             // 하단 (~538px)
+
+  // ── 타이밍 구간 (dur=5000 기준) ──
+  // [0 ~ ZOOM_START]        : 일반 영상 재생 (2.4s)
+  // [ZOOM_START ~ ZOOM_DONE]: 코파일럿 입력창으로 줌인 애니 (400ms)
+  // [ZOOM_DONE ~ RESULT_START]: 텍스트 전체 보이도록 홀드 (1000ms)
+  // [RESULT_START ~ dur]    : 결과이미지 즉시 등장 (1200ms)
+  const ZOOM_ANIM   = 400;
+  const ZOOM_HOLD   = 1000;
+  const ZOOM_START  = dur - 2600;               // 줌 시작 (5000ms 기준 = 2400ms)
+  const ZOOM_DONE   = ZOOM_START + ZOOM_ANIM;   // 줌 완료 → 홀드 시작
+  const RESULT_START= ZOOM_DONE  + ZOOM_HOLD;   // 홀드 끝 → 결과이미지 즉시
+
+  /* ── 상단 영상 영역 ── */
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,W,VH);
+
+  if(vReady && vEl && vEl.videoWidth){
+    const vw=vEl.videoWidth, vh=vEl.videoHeight;
+    const sc=Math.min(W/vw, VH/vh);
+    const vw2=vw*sc, vh2=vh*sc;
+    const vx=(W-vw2)/2, vy=(VH-vh2)/2;
+
+    // 돋보기 진행도: 0=일반뷰, 1=줌인완료 — 홀드·결과이미지 구간에도 1 유지
+    const zp = easeOut(clamp((el - ZOOM_START) / ZOOM_ANIM, 0, 1));
+
+    if(el < ZOOM_START){
+      /* 일반 contain-fit */
+      ctx.drawImage(vEl, vx, vy, vw2, vh2);
+    } else {
+      /* 돋보기: 소스 rect를 원본→줌 영역으로 보간 */
+      const zr = zoomRegion || {x:0.60, y:0.65, w:0.40, h:0.30};
+      const srcX1=vw*zr.x, srcY1=vh*zr.y, srcW1=vw*zr.w, srcH1=vh*zr.h;
+
+      const cSX = lerp(0,  srcX1, zp);
+      const cSY = lerp(0,  srcY1, zp);
+      const cSW = lerp(vw, srcW1, zp);
+      const cSH = lerp(vh, srcH1, zp);
+
+      const dsc = Math.min(W/cSW, VH/cSH);
+      const dw  = cSW*dsc, dh = cSH*dsc;
+      const dx  = (W-dw)/2, dy = (VH-dh)/2;
+
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0,0,W,VH); ctx.clip();
+      ctx.drawImage(vEl, cSX, cSY, cSW, cSH, dx, dy, dw, dh);
+      ctx.restore();
+
+      /* 줌 완료 후 액센트 테두리 (홀드 구간 내내 표시) */
+      if(zp > 0.85){
+        const ba = clamp((zp - 0.85) / 0.15, 0, 1);
+        ctx.globalAlpha = ba * 0.6;
+        ctx.strokeStyle = accentColor;
+        ctx.lineWidth = 8;
+        ctx.strokeRect(dx+4, dy+4, dw-8, dh-8);
+        ctx.globalAlpha = 1;
+      }
+    }
+  } else {
+    /* 플레이스홀더 */
+    const pg=ctx.createLinearGradient(0,0,W,VH);
+    pg.addColorStop(0,'#000c1e'); pg.addColorStop(1,'#001a40');
+    ctx.fillStyle=pg; ctx.fillRect(0,0,W,VH);
+    ctx.globalAlpha=.4;
+    t(`📹 ${label}_demo.mov`, W/2, VH/2, 38, '#4FC3F7','center','700');
+    ctx.globalAlpha=1;
+  }
+
+  /* 결과 이미지 오버레이 */
+  const imgEl = el - RESULT_START;
+  if(imgEl > 0 && resultImgs && resultImgs.length > 0){
+    const imgs = resultImgs.filter(Boolean);
+    // 텍스트 영역(TY) 위까지만 이미지 허용, 전체 화면 중앙 배치
+    const maxImgW = W * 0.92 * resultScale;
+    const maxImgH = Math.min(TY * 0.90, H * 0.56) * resultScale;
+    const imgCY = Math.min(H / 2, TY - maxImgH / 2 - 24); // 텍스트 안 겹치는 중심 Y
+
+    // 팝 스케일
+    const pt = clamp(imgEl / 280, 0, 1);
+    const popSc = pt < 0.28
+      ? lerp(0, 1.35, easeOut(pt / 0.28))
+      : pt < 0.57
+      ? lerp(1.35, 0.92, easeOut((pt-0.28)/0.29))
+      : lerp(0.92, 1.0,  easeOut((pt-0.57)/0.43));
+
+    // 흰색 플래시
+    const flash = clamp(1 - imgEl/80, 0, 1);
+    if(flash > 0){
+      ctx.fillStyle = `rgba(255,255,255,${flash * 0.7})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // 전체 화면 어두운 오버레이
+    const ia = easeOut(clamp(imgEl/120, 0, 1));
+    ctx.fillStyle = `rgba(0,0,0,${ia*0.65})`;
+    ctx.fillRect(0, 0, W, H);
+    ctx.globalAlpha = ia;
+
+    // 팝 스케일 — 전체 화면 중앙 기준
+    ctx.save();
+    ctx.translate(W/2, imgCY);
+    ctx.scale(popSc, popSc);
+    ctx.translate(-W/2, -imgCY);
+
+    if(imgs.length === 1){
+      const img = imgs[0];
+      if(img.naturalWidth > 0){
+        const isc = Math.min(maxImgW/img.naturalWidth, maxImgH/img.naturalHeight);
+        const iw = img.naturalWidth*isc, ih = img.naturalHeight*isc;
+        ctx.drawImage(img, (W-iw)/2, imgCY - ih/2, iw, ih);
+      }
+    } else {
+      const gap = 20;
+      const slotW = (maxImgW-gap)/2;
+      imgs.forEach((img,i)=>{
+        if(!img || img.naturalWidth===0) return;
+        const isc = Math.min(slotW/img.naturalWidth, maxImgH/img.naturalHeight);
+        const iw = img.naturalWidth*isc, ih = img.naturalHeight*isc;
+        const ox = (W-(slotW*2+gap))/2;
+        ctx.drawImage(img, ox+i*(slotW+gap)+(slotW-iw)/2, imgCY - ih/2, iw, ih);
+      });
+    }
+
+    ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+
+  /* 앱명 배지 — @ai.saver_ 아래로 내림 */
+  const fi = easeOut(clamp(el/250, 0, 1));
+  ctx.globalAlpha = fi;
+  rr(W/2-170, 156, 340, 66, 33, accentColor, null);
+  t(appName, W/2, 189, 32, '#fff','center','800');
+  ctx.globalAlpha = 1;
+
+  /* ── 하단 설명 영역 ── */
+  ctx.fillStyle = '#F5F0E8'; ctx.fillRect(0, TY, W, BH);
+  ctx.fillStyle = accentColor; ctx.fillRect(0, TY, W, 4);
+
+  ctx.globalAlpha = fi;
+  const lines = desc.split('\n');
+  const lineH = 92;
+  const totalH = lines.length * lineH;
+  const startY = TY + (BH - totalH) * 0.32 + lineH/2;
+  lines.forEach((line,i)=>{
+    const fs = i===0 ? 62 : 46;
+    const color = i===0 ? '#111' : 'rgba(0,0,0,.65)';
+    t(line, W/2, startY + i*lineH, fs, color,'center', i===0?'900':'700');
+  });
+  ctx.globalAlpha = 1;
+}
+
+/* 코파일럿 사이드바 줌 영역 (비디오 전체 대비 비율)
+   x/y: 좌상단 시작점, w/h: 영역 크기 — 녹화본에 맞게 조정 가능
+   Excel: 전체 사이드바 (현재 위치 OK)
+   Word/PPT: 사이드바 하단 입력창 텍스트 영역에 집중 */
+const ZOOM_EXCEL = {x:0.60, y:0.62, w:0.40, h:0.32};   // 우측 사이드바
+const ZOOM_WORD  = {x:0.80, y:0.22, w:0.20, h:0.18};   // 우측 끝 주황 버블 확대
+const ZOOM_PPT   = {x:0.80, y:0.22, w:0.20, h:0.18};   // 동일
+
+function drawExcelDemo(el){
+  drawVideoFullscreen(el,vidExcel,vidReady.excel,
+    'EXCEL',
+    'excel',
+    'AI가 직접 피벗 테이블을 생성합니다\n수식 몰라도, 명령 하나면 완성',
+    '#217346', 5000, [img1], ZOOM_EXCEL);
+}
+function drawWordDemo(el){
+  drawVideoFullscreen(el,vidWord,vidReady.word,
+    'WORD',
+    'word',
+    'AI가 보고서를 통째로 재작성합니다\n임원 보고용으로 5초 만에 완성',
+    '#2B579A', 5000, [img2,img4], ZOOM_WORD, 1.2);
+}
+function drawPptDemo(el){
+  drawVideoFullscreen(el,vidPpt,vidReady.ppt,
+    'POWERPOINT',
+    'ppt',
+    'AI가 슬라이드를 자동 업데이트합니다\n새 데이터 넣으면 디자인 그대로',
+    '#B7472A', 5000, [img3], ZOOM_PPT);
+}
+
+/* ══════════════════════════════════════════════
+   씬 4: 통계 그래프 (18~24s) — 신규 씬
+   데이터: Microsoft/Forrester 생산성 데이터
+══════════════════════════════════════════════ */
+function drawStats(el){
+  const p=el/6000;
+  ctx.fillStyle='#F5F0E8'; ctx.fillRect(0,0,W,H);
+
+  ctx.globalAlpha=easeOut(p*6);
+  t('생산성 향상 데이터',W/2,240,30,'rgba(0,0,0,.45)','center','700');
+  t('Copilot 도입 시',W/2,320,60,'#111',   'center','900');
+  t('이렇게 달라집니다',W/2,400,60,'#0078D4','center','900');
+  ctx.globalAlpha=1;
+
+  /* 바 차트 */
+  const bars=[
+    {label:'Word', sublabel:'문서 작성 속도', pct:55, color:'#4FC3F7', t0:400},
+    {label:'Excel',sublabel:'데이터 분석 속도',pct:35, color:'#0078D4', t0:1200},
+    {label:'PPT',  sublabel:'슬라이드 제작',   pct:45, color:'#8a50d8', t0:2000},
+  ];
+
+  const bw=220, bh=52, bx=200, gapY=160;
+  const maxBarW=660;
+
+  bars.forEach((b,i)=>{
+    const bel=el-b.t0;
+    if(bel<0) return;
+    const ba=easeOut(clamp(bel/250,0,1));
+    const bp=easeOut(clamp((bel-100)/700,0,1));
+    const ty2=560+i*gapY;
+
+    ctx.globalAlpha=ba;
+    /* 라벨 */
+    t(b.label,   bx-20,ty2,38,'#111',  'right','900');
+    t(b.sublabel,bx-20,ty2+44,24,'rgba(0,0,0,.5)','right','600');
+
+    /* 배경 바 */
+    rr(bx,ty2-bh/2,maxBarW,bh,bh/2,'rgba(0,0,0,.10)',null);
+    /* 채워지는 바 */
+    const fw=maxBarW*(b.pct/100)*bp;
+    if(fw>bh/2){
+      const barGrad=ctx.createLinearGradient(bx,0,bx+fw,0);
+      barGrad.addColorStop(0,b.color); barGrad.addColorStop(1,b.color+'88');
+      rr(bx,ty2-bh/2,fw,bh,bh/2,barGrad,null);
+      sh(b.color,12);
+      rr(bx,ty2-bh/2,fw,bh,bh/2,barGrad,null);
+      nsh();
+    }
+    /* % 텍스트 */
+    const dispPct=Math.round(b.pct*bp);
+    ctx.globalAlpha=ba;
+    t(`+${dispPct}%`,bx+maxBarW+24,ty2,42,b.color,'left','900');
+    ctx.globalAlpha=1;
+  });
+
+  /* 출처 */
+  ctx.globalAlpha=easeOut(clamp((p-.6)*4,0,1));
+  t('* Microsoft/Forrester 생산성 리서치 기준',W/2,1120,24,'rgba(0,0,0,.4)','center','600');
+  ctx.globalAlpha=1;
+
+  /* 보조 통계 */
+  ctx.globalAlpha=easeOut(clamp((p-.55)*4,0,1));
+  const sx=160, sy2=1170, sw=840/3-20;
+  const stats=[
+    {n:'2,000만',d:'주간 활성 사용자'},
+    {n:'1,500만',d:'유료 M365 시트'},
+    {n:'35.8%',  d:'직장 전환율'},
+  ];
+  stats.forEach((s,i)=>{
+    const sx2=sx+i*(sw+30);
+    rr(sx2,sy2,sw,140,18,'rgba(0,120,212,.08)','rgba(0,120,212,.3)',1.5);
+    t(s.n,sx2+sw/2,sy2+48,36,'#0078D4','center','900');
+    t(s.d,sx2+sw/2,sy2+96,22,'rgba(0,0,0,.55)','center','600');
+  });
+  ctx.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════════
+   씬 5: 사이드바 (24~30s) — 속도 UP
+══════════════════════════════════════════════ */
+const STEPS=[
+  {text:'데이터 분석 완료',   st:'done',  t0:0},
+  {text:'수식 생성 완료',     st:'done',  t0:400},
+  {text:'피벗 테이블 생성 중…',st:'active',t0:700},
+  {text:'차트 완성',          st:'wait',  t0:1400},
+];
+
+function drawSidebar(el){
+  const p=el/6000;
+  ctx.fillStyle='#F5F0E8'; ctx.fillRect(0,0,W,H);
+
+  ctx.globalAlpha=easeOut(p*6);
+  const lt='AGENT SIDEBAR';
+  ctx.font=`800 27px 'Noto Sans KR',sans-serif`;
+  const ltw=ctx.measureText(lt).width;
+  rr(W/2-ltw/2-38,188,ltw+76,58,29,'rgba(0,120,212,.12)','rgba(0,120,212,.4)',2);
+  t(lt,W/2,217,27,'#0078D4','center','800');
+  t('AI가 뭘 하는지',     W/2,340,66,'#111',   'center','900');
+  t('실시간으로 보입니다',W/2,426,66,'#0078D4','center','900');
+  ctx.globalAlpha=1;
+
+  const sa=easeOut(clamp((p-.15)*5,0,1));
+  ctx.globalAlpha=sa;
+  const sx=80, sy=530, sw=W-160, sh2=560;
+  rr(sx,sy,sw,sh2,26,'rgba(0,0,0,.04)','rgba(0,0,0,.12)',2);
+  t('📋 Copilot 작업 진행 중…',sx+34,sy+50,31,'#0078D4','left','700');
+  ctx.strokeStyle='rgba(0,0,0,.08)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(sx+22,sy+90); ctx.lineTo(sx+sw-22,sy+90); ctx.stroke();
+  ctx.globalAlpha=1;
+
+  STEPS.forEach((st,i)=>{
+    const sel=el-st.t0;
+    if(sel<0) return;
+    const sfa=clamp(sel/280,0,1)*sa;
+    ctx.globalAlpha=sfa;
+    const sty=sy+118+i*108;
+    let dc='#222';
+    if(st.st==='done')   dc='#22C55E';
+    else if(st.st==='active'){ dc='#FFD740'; const bl=.4+.6*Math.abs(Math.sin(Date.now()/430)); ctx.globalAlpha=sfa*bl; }
+    ctx.beginPath(); ctx.arc(sx+50,sty+18,13,0,Math.PI*2);
+    ctx.fillStyle=dc;
+    if(st.st!=='wait'){sh(dc,11);}
+    ctx.fill(); nsh(); ctx.globalAlpha=sfa;
+    ctx.font=`${st.st==='active'?'700':'600'} 36px 'Noto Sans KR',sans-serif`;
+    ctx.fillStyle=st.st==='done'?'rgba(0,0,0,.35)':st.st==='active'?'#111':'rgba(0,0,0,.25)';
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillText(st.text,sx+84,sty+18);
+    if(st.st==='done'){
+      const tw2=ctx.measureText(st.text).width;
+      ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(sx+84,sty+18); ctx.lineTo(sx+84+tw2,sty+18); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  });
+
+}
+
+/* ══════════════════════════════════════════════
+   씬 6: M365 호환 (30~35s)
+══════════════════════════════════════════════ */
+function drawCompat(el){
+  const p=el/5000;
+  ctx.fillStyle='#F5F0E8'; ctx.fillRect(0,0,W,H);
+  const tv=easeOut(clamp(p*4,0,1));
+  ctx.globalAlpha=tv;
+  const bounce=Math.sin(Date.now()/680)*16;
+  ctx.font=`900 126px 'Noto Sans KR',sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🎯',W/2,310+bounce);
+  t('Microsoft 365',W/2,516,70,'#111',   'center','900');
+  t('구독자라면',    W/2,608,70,'#0078D4','center','900');
+  t('지금 바로 됩니다',W/2,700,70,'#E07000','center','900');
+  t('추가 비용 없이 · 활성화 방법만 알면 끝',W/2,808,36,'rgba(0,0,0,.5)','center','600');
+  ctx.globalAlpha=1;
+
+  const ba=easeOut(clamp((p-.28)*4,0,1));
+  ctx.globalAlpha=ba;
+  const bx=80,by=900,bw=W-160,bh=380;
+  rr(bx,by,bw,bh,30,'rgba(0,120,212,.07)','rgba(0,120,212,.35)',3);
+  t('사용 가능 앱',bx+32,by+38,27,'#0078D4','left','800');
+  ['Word · Excel · PowerPoint','기존 M365 구독자 바로 사용','활성화 방법 모르는 분 많음'].forEach((item,i)=>{
+    const iy=by+104+i*96;
+    ctx.beginPath(); ctx.arc(bx+46,iy+22,12,0,Math.PI*2);
+    ctx.fillStyle='#22C55E'; sh('#22C55E',9); ctx.fill(); nsh();
+    t(item,bx+78,iy+22,36,'#111','left','700');
+  });
+  ctx.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════════
+   씬 7: CTA (35~38s)
+══════════════════════════════════════════════ */
+function drawCTA(el){
+  const p=el/3000;
+  ctx.fillStyle='#F5F0E8'; ctx.fillRect(0,0,W,H);
+  const tv=easeOut(clamp(p*3,0,1));
+  ctx.globalAlpha=tv;
+  const bx=60,by=H/2-520,bw=W-120,bh=1040;
+  rr(bx,by,bw,bh,44,'rgba(255,255,255,.85)','rgba(0,120,212,.25)',2);
+  ctx.font=`900 108px 'Noto Sans KR',sans-serif`;
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('💬',W/2,by+122);
+  t('활성화 방법 +',        W/2,by+252,56,'#111',   'center','900');
+  t('직장인 활용 사례 3가지',W/2,by+332,56,'#0078D4','center','900');
+  t('DM으로 드립니다',      W/2,by+412,56,'#111',   'center','900');
+
+  const pu=.7+.3*Math.sin(Date.now()/500);
+  const kg=ctx.createLinearGradient(bx+70,by+472,bx+bw-70,by+592);
+  kg.addColorStop(0,'#0078D4'); kg.addColorStop(1,'#005a9e');
+  rr(bx+70,by+474,bw-140,118,28,kg,null);
+  sh(`rgba(0,120,212,${pu})`,36);
+  t('코파일럿',W/2,by+533,78,'#fff','center','900'); nsh();
+
+  t('댓글에 위 단어만 남겨주세요',W/2,by+650,36,'rgba(0,0,0,.55)','center','600');
+  t('바로 DM 드립니다',          W/2,by+712,36,'rgba(0,0,0,.55)','center','600');
+
+  /* Copilot 로고 작게 */
+  drawCopilotLogo(W/2,by+822,80,1);
+  t('@ai.saver_',W/2,by+882,50,'#111','center','900');
+  ctx.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════════
+   메인 루프
+══════════════════════════════════════════════ */
+function frame(ts){
+  if(!startTime) startTime=ts;
+  const el=ts-startTime;
+  const prog=Math.min(el/TOTAL,1);
+
+  ctx.clearRect(0,0,W,H);
+  tickPts();
+
+  /* 비디오 씬별 재생 제어 */
+  if(el>=4000  && el<9000){  if(vidExcel.paused) vidExcel.play().catch(()=>{}); }
+  else vidExcel.pause();
+  if(el>=9500  && el<14500){ if(vidWord.paused)  vidWord.play().catch(()=>{});  }
+  else vidWord.pause();
+  if(el>=15000 && el<20000){ if(vidPpt.paused)   vidPpt.play().catch(()=>{});  }
+  else vidPpt.pause();
+
+  if     (el<2000)  drawOpening(el);
+  else if(el<4000)  drawAnnounce(el-2000);
+  else if(el<9000)  drawExcelDemo(el-4000);      // 5000ms
+  else if(el<9500)  drawExcelDemo(5000);          // 500ms 홀드 (결과이미지 freeze)
+  else if(el<14500) drawWordDemo(el-9500);        // 5000ms
+  else if(el<15000) drawWordDemo(5000);           // 500ms 홀드
+  else if(el<20000) drawPptDemo(el-15000);        // 5000ms
+  else if(el<20500) drawPptDemo(5000);            // 500ms 홀드
+  else if(el<25500) drawStats(el-20500);          // 5000ms
+  else if(el<29500) drawSidebar(el-25500);        // 4000ms
+  else if(el<32500) drawCompat(el-29500);         // 3000ms
+  else              drawCTA(el-32500);            // 3500ms
+
+  drawPts();
+  drawTopBar(Math.min(1,el/400));
+  drawPersistentSub(el);   // ← 하단 자막 항상 표시
+  drawProgress(prog);
+
+  if(el<TOTAL+600){
+    animFrame=requestAnimationFrame(frame);
+  } else if(window._recStopCb){
+    window._recStopCb();
+    window._recStopCb=null;
+  }
+}
+
+function stopAnim(){ if(animFrame){cancelAnimationFrame(animFrame);animFrame=null;} startTime=null; }
+
+function startPreview(){
+  stopAnim(); initPts();
+  [vidExcel,vidWord,vidPpt].forEach(v=>{ v.currentTime=0; v.pause(); });
+  animFrame=requestAnimationFrame(frame);
+}
+
+function startRecord(){
+  const btn=document.getElementById('btnRec');
+  if(isRec) return; isRec=true;
+  btn.disabled=true;
+  const stream=canvas.captureStream(FPS);
+  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:BITRATE});
+  const chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:'video/webm'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='copilot_agent_mode_1080x1920.webm';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    btn.disabled=false; isRec=false;
+    btn.textContent='✅ 다운로드 완료'; setTimeout(()=>{ btn.textContent='● 녹화 시작'; }, 3000);
+  };
+  rec.start(100);
+  stopAnim(); initPts();
+  [vidExcel,vidWord,vidPpt].forEach(v=>{ v.currentTime=0; v.pause(); });
+  window._recStopCb = ()=>{ stopAnim(); rec.stop(); };
+  animFrame=requestAnimationFrame(frame);
+  setTimeout(()=>{ if(window._recStopCb){ window._recStopCb(); window._recStopCb=null; } }, TOTAL+1200);
+}
+
+window.addEventListener('load',()=>{
+  document.fonts.load(`900 40px 'Noto Sans KR'`).then(()=>{
+    initPts();
+    startTime=performance.now();
+    requestAnimationFrame(t=>{ frame(t); cancelAnimationFrame(animFrame); startTime=null; });
+  });
+});
+</script>
+</body>
+</html>
