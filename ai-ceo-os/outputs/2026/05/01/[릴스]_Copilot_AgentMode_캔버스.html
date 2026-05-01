@@ -718,17 +718,22 @@ function startRecord(){
   if(isRec) return; isRec=true;
   btn.disabled=true;
   const stream=canvas.captureStream(FPS);
-  const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
-  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:BITRATE});
+  const mimes=['video/webm;codecs=vp9','video/webm','video/mp4'];
+  const mime=mimes.find(m=>MediaRecorder.isTypeSupported(m))||'';
+  if(!mime){ alert('이 브라우저는 녹화를 지원하지 않습니다.\nChrome에서 열어주세요.'); btn.disabled=false; isRec=false; return; }
+  let rec;
+  try{ rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:BITRATE}); }
+  catch(e){ alert('MediaRecorder 오류: '+e.message+'\nChrome에서 열어주세요.'); btn.disabled=false; isRec=false; return; }
   const chunks=[];
   rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
   rec.onstop=()=>{
-    const blob=new Blob(chunks,{type:'video/webm'});
+    const ext=mime.includes('mp4')?'mp4':'webm';
+    const blob=new Blob(chunks,{type:mime});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href=url; a.download='copilot_agent_mode_1080x1920.webm';
+    a.href=url; a.download=`copilot_agent_mode_1080x1920.${ext}`;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
     btn.disabled=false; isRec=false;
     btn.textContent='✅ 다운로드 완료'; setTimeout(()=>{ btn.textContent='● 녹화 시작'; }, 3000);
   };
