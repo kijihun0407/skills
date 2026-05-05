@@ -1,7 +1,6 @@
 # 캐러셀 디자인 가이드 — @ai.saver_ 표준
 
-> 이 가이드를 기준으로 모든 캐러셀을 제작합니다.
-> 참고 파일: `.tmp/carousel_assets/carousel_gpt55.html` (GPT-5.5 기능 — 1호 확정본)
+> 기준 파일: `.tmp/carousel_assets/carousel_ai_research.html` (AI 연구 데이터 유통기한 — 확정본)
 
 ---
 
@@ -9,119 +8,198 @@
 
 | 항목 | 값 |
 |------|-----|
-| 슬라이드 크기 | 1080×1350px (4:5 비율 — 인스타 최적) |
-| 브라우저 표시 | 50% 축소 (540×675px 프리뷰) |
-| 슬라이드 수 | 7장 (커버 1 + 본문 4~5 + CTA 1) |
-| 제작 방식 | HTML/CSS → 슬라이드별 스크린샷 → 인스타 캐러셀 업로드 |
+| 슬라이드 크기 | 1080×1080px (1:1 정사각형) |
+| 슬라이드 수 | 7장 (커버 1 + 본문 5 + CTA 1) |
+| 제작 방식 | HTML/CSS → Playwright PNG 자동 추출 |
+| 추출 스크립트 | `.tmp/carousel_assets/export_slides.js` |
+| 업로드 | slide_01.png ~ slide_07.png 순서대로 인스타 캐러셀 |
 
 ---
 
-## 색상 시스템 (다크 테마)
+## 폰트
 
 ```css
-/* 배경 */
---bg-main:    #080810   /* 슬라이드 기본 배경 */
---bg-body:    #020208   /* 브라우저 배경 */
-
-/* 텍스트 */
---text-white:  #FFFFFF
---text-muted:  rgba(255,255,255,0.62)
---text-dim:    rgba(255,255,255,0.28)
-
-/* 포인트 컬러 (슬라이드별 구분) */
---yellow:  #FBBF24   /* 커버, 기본 강조 */
---purple:  #8B5CF6   /* 기능 2 */
---blue:    #3B82F6   /* 기능 3 */
---green:   #10B981   /* 기능 4 */
+font-family: 'Noto Sans KR', 'Inter', sans-serif;
+/* Google Fonts CDN 링크 필수 */
 ```
 
 ---
 
-## 공통 레이아웃 규칙
+## 커버 슬라이드 (1장) 구조
 
-### 상단 계정 배지 (모든 슬라이드 고정)
-```css
-position: absolute;
-top: 48px; 좌우 중앙;
-background: rgba(255,255,255,0.07);
-border: 1.5px solid rgba(255,255,255,0.14);
-font-size: 26px; font-weight: 800;
-padding: 12px 44px; border-radius: 50px;
+배경·인물·텍스트를 레이어로 쌓는 방식:
+
 ```
-표시 텍스트: `@ai.saver_`
-
-### 페이지 번호 (모든 슬라이드 고정)
-```css
-position: absolute;
-bottom: 48px; right: 64px;
-color: rgba(255,255,255,0.28);
-font-size: 24px; font-weight: 600;
+[Layer 0] bg-paper    — 주제 관련 이미지/논문/자료 사진, blur(4px) brightness(0.18)
+[Layer 1] person-photo — 인물 사진, 오른쪽 배치, 좌측·하단 가장자리 mask 페이드
+[Layer 2] paper-card   — 보조 자료 이미지 1 (오른쪽 상단, 가장자리 페이드)
+[Layer 3] tweet-card   — 보조 자료 이미지 2 (오른쪽 하단, 가장자리 페이드)
+[Layer 4] grad-left    — 좌→우 어두운 그라디언트 (텍스트 가독성)
+[Layer 5] grad-bottom  — 하→상 그라디언트
+[Layer 6] tag          — 상단 좌측 카테고리 태그
+[Layer 7] content      — 하단 좌측 헤드라인 + 서브텍스트
 ```
-표시 형식: `01 / 07`
 
-### 여백 기준
-- 좌우 기본 여백: `80px`
-- 상단 컨텐츠 시작: `150px` (배지 아래)
+### 커버 핵심 CSS 패턴
+
+```css
+/* 배경 자료 이미지 */
+.s1 .bg-paper {
+  position:absolute; inset:0;
+  background:url('./자료이미지.jpeg') center/cover no-repeat;
+  filter:blur(4px) brightness(0.18);
+  transform:scale(1.06);
+}
+
+/* 인물 사진 — 우측, 가장자리 페이드 */
+.s1 .person-photo {
+  position:absolute;
+  right:240px; top:0; bottom:0;
+  width:520px; height:100%;
+  object-fit:cover; object-position:center top;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 10%, black 92%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 10%, black 92%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 88%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* 보조 이미지 공통 — 우측 absolute, 가장자리 페이드 */
+.s1 .paper-card {
+  position:absolute;
+  right:0; top:60px;
+  width:290px; height:370px;
+  object-fit:cover; object-position:top;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 8%, black 90%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, black 8%, black 90%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* 헤드라인 — 하단 좌측 */
+.s1 .content {
+  position:absolute;
+  bottom:185px; left:72px;
+  width:580px; z-index:10;
+}
+.s1 .headline {
+  font-size:96px; font-weight:900; color:#FFFFFF;
+  line-height:1.05; letter-spacing:-0.03em; word-break:keep-all;
+}
+.s1 .headline em { font-style:normal; color:#60A5FA; }
+```
 
 ---
 
-## 슬라이드별 구성
+## 본문 슬라이드 (2~6장) 구조
 
-### 1장 — 커버
-- 상단: 카테고리 뱃지 (골드 테두리 pill)
-- 중앙: 메인 제목 (대형 숫자/키워드 골드 그라디언트)
-- 하단: 기능 태그 모음 + 서브텍스트
-- 배경: 골드 + 블루 글로우 장식
+### 짝수 슬라이드 — 다크 테마 (#0A1628)
+- 배경: 네이비 다크 + 격자 오버레이
+- 텍스트: 흰색/연파랑
+- 우측에 자료 이미지(있을 경우): absolute 배치, `border-radius:16px`, 블러 없음
+- 이미지 있을 경우 텍스트 우측 여백 400px 확보
 
-### 2~5장 — 기능/본문 슬라이드
-- 배경 왼쪽 하단: 대형 반투명 번호 (장식)
-- 상단 좌측: 번호 박스(포인트 컬러) + "카테고리" 레이블
-- 우측: 이모지 아이콘 박스 (포인트 컬러 테두리)
-- 제목: main(흰색) + sub(포인트 컬러)
-- 구분선 후 본문 설명 3줄
-- 하단: 실전 TIP 박스 (포인트 컬러 반투명 배경)
+### 홀수 슬라이드 — 라이트 테마 (#FFFFFF)
+- 상단 포인트 컬러 accent bar (6px)
+- 텍스트: 다크 (#0A1628)
+- 우측 이미지 동일 방식
 
-### 마지막 CTA 슬라이드
-- "유용했다면 💾" 상단
-- 대형 메인 문구
-- 내용 요약 리스트 (포인트 박스)
-- `@ai.saver_` 골드 그라디언트 계정명
-
----
-
-## 폰트 시스템
+### 우측 이미지 배치 (자료/원문 있을 때)
 
 ```css
-font-family: 'Pretendard', -apple-system, 'Apple SD Gothic Neo', sans-serif;
-
-/* 커버 대형 숫자/키워드 */  font-size: 130px; font-weight: 900;
-
-/* 슬라이드 제목 main */     font-size: 58px;  font-weight: 900;
-/* 슬라이드 제목 sub */      font-size: 27px;  font-weight: 700;
-/* 본문 설명 */              font-size: 29px;  font-weight: 500; line-height: 1.85;
-/* TIP 박스 */               font-size: 27px;  font-weight: 700;
-/* 페이지 번호 */             font-size: 24px;  font-weight: 600;
+.wrap {
+  position:absolute;
+  right:36px; top:50%; transform:translateY(-50%);
+  width:330px; z-index:4;
+  display:flex; flex-direction:column; align-items:center; gap:18px;
+}
+.wrap img {
+  width:330px; height:460px;
+  object-fit:cover; object-position:top;
+  border-radius:16px;
+}
+.wrap .caption {
+  font-size:20px; font-weight:500; color:rgba(255,255,255,0.45);
+  text-align:center; font-style:italic;
+}
 ```
 
 ---
 
-## 네비게이션
-- 좌/우 화살표 버튼 + 하단 도트 인디케이터
-- 키보드 `←` `→` 지원
-- 도트 활성화: 골드(`#FBBF24`) + 가로로 늘어남
+## CTA 슬라이드 (7장) 구조
+
+- 배경: 흰색
+- 상단 accent bar (파란색)
+- "무료 자료 제공" 라벨
+- 헤드라인 (체크리스트 전문 DM으로 드려요)
+- 댓글 키워드 박스: `"체크"` → DM 자동 발송
+- 팔로우 후 댓글 안내
+
+---
+
+## 색상 시스템
+
+```css
+/* 다크 슬라이드 */
+--dark-bg:    #0A1628
+--dark-text:  #FFFFFF
+--dark-muted: #9CA3AF
+--accent:     #1D6FEB   /* 파란색 포인트 */
+--accent-lt:  #60A5FA
+
+/* 라이트 슬라이드 */
+--light-bg:   #FFFFFF
+--light-text: #0A1628
+--light-sub:  #4B5563
+
+/* 위험/강조 */
+--red:        #EF4444
+--yellow:     #FCD34D
+```
+
+---
+
+## 공통 요소
+
+```css
+/* 푸터 — 모든 슬라이드 */
+.footer {
+  position:absolute;
+  bottom:52px; left:72px; right:72px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+/* @ai.saver_ | 01 / 07 */
+
+/* 태그 pill */
+.tag {
+  display:inline-flex; align-items:center;
+  font-size:20px; font-weight:700;
+  letter-spacing:0.14em; text-transform:uppercase;
+  padding:10px 24px; border-radius:100px;
+}
+```
 
 ---
 
 ## 제작 SOP
 
-1. 이 가이드 참고 → HTML 파일 생성 (`carousel_[주제].html`)
-2. 저장 위치: `.tmp/carousel_assets/`
-3. 브라우저로 열기 → 슬라이드별 스크린샷 (고화질: 브라우저 줌 200%)
-4. 7장 이미지 → 인스타그램 캐러셀 업로드
-5. 캡션 + 해시태그 첨부
+1. `.tmp/carousel_assets/carousel_ai_research.html` 복사 → `carousel_[주제].html`
+2. 필요한 이미지를 `.tmp/carousel_assets/`에 복사
+3. 슬라이드별 텍스트·색상·이미지 교체
+4. 브라우저로 열어 확인
+5. `node export_slides.js` 실행 → 7장 PNG 자동 추출
+6. 캡션 md 파일 작성 → `outputs/2026/MM/DD/[캐러셀]_주제.md`
+7. slide_01 ~ 07 + 캡션으로 인스타 업로드
 
 ---
 
 ## 참고 파일
-- 1호 확정본: `.tmp/carousel_assets/carousel_gpt55.html` (GPT-5.5 직장인 필수 기능)
-- 캐러셀 대본: `outputs/2026/04/25/[캐러셀]_이번주_캐러셀2종_대본+CSV.md`
+- 확정 템플릿: `.tmp/carousel_assets/carousel_ai_research.html`
+- PNG 추출 스크립트: `.tmp/carousel_assets/export_slides.js`
