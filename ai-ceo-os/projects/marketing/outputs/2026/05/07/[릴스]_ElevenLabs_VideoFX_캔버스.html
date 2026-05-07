@@ -3,709 +3,531 @@
 <head>
 <meta charset="UTF-8">
 <title>Reels — ElevenLabs + VideoFX</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;700;800;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
   body {
-    background: #000;
-    display: flex; align-items: center; justify-content: center;
-    width: 100vw; height: 100vh; overflow: hidden;
-    font-family: 'Inter', sans-serif;
+    background:#000;
+    display:flex; align-items:center; justify-content:center;
+    width:100vw; height:100vh; overflow:hidden;
   }
-  canvas { transform-origin: center center; display: block; }
-  #controls {
-    position: fixed; bottom: 20px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 12px; z-index: 100;
+  canvas { transform-origin:center center; display:block; }
+  #ui {
+    position:fixed; bottom:18px; left:50%;
+    transform:translateX(-50%);
+    display:flex; gap:10px; z-index:100;
   }
   button {
-    padding: 10px 24px; border: none; border-radius: 8px;
-    background: rgba(255,255,255,0.12); color: #fff;
-    font-size: 14px; font-family: 'Inter', sans-serif;
-    cursor: pointer; backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.15); transition: background .2s;
+    padding:9px 22px; border:none; border-radius:8px;
+    background:rgba(255,255,255,.13); color:#fff;
+    font-size:13px; cursor:pointer;
+    border:1px solid rgba(255,255,255,.18);
   }
-  button:hover { background: rgba(255,255,255,0.22); }
-  button:disabled { opacity: .4; cursor: default; }
+  button:disabled { opacity:.35; cursor:default; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="controls">
+<div id="ui">
   <button id="btnPlay">&#9654; 재생</button>
-  <button id="btnRec">&#9210; 녹화 시작</button>
+  <button id="btnRec">&#9210; 녹화</button>
 </div>
 <script>
-// ─── Constants ─────────────────────────────────────────────────────────────
-const W=1080, H=1920, TOTAL=35000, FPS=30, BITRATE=8_000_000;
-const FONT_KR='"Noto Sans KR",sans-serif';
-const FONT_EN='"Inter",sans-serif';
-const C_BLUE='#4B6FFF', C_PURPLE='#8B5CF6', C_WHITE='#FFFFFF';
+// ── Constants ────────────────────────────────────────────────────────────────
+const W=1080, H=1920, TOTAL=25000, FPS=30, BITRATE=10_000_000;
+const FKR='"Noto Sans KR",sans-serif', FEN='"Inter",sans-serif';
 
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-canvas.width=W; canvas.height=H;
+const cv=document.getElementById('c');
+const ctx=cv.getContext('2d');
+cv.width=W; cv.height=H;
 
-function scaleCanvas(){
-  const s=Math.min(window.innerWidth/W,window.innerHeight/H)*.95;
-  canvas.style.transform=`scale(${s})`;
+function resize(){
+  const s=Math.min(innerWidth/W,innerHeight/H)*.95;
+  cv.style.transform=`scale(${s})`;
 }
-scaleCanvas(); window.addEventListener('resize',scaleCanvas);
+resize(); addEventListener('resize',resize);
 
-// ─── Math helpers ──────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 const lerp=(a,b,t)=>a+(b-a)*t;
 const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
-const easeOut=t=>1-Math.pow(1-t,3);
-const easeIn=t=>t*t*t;
-const easeInOut=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const eO=t=>1-Math.pow(1-t,3);   // ease-out cubic
+const eIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
 
-// ─── Scene list ────────────────────────────────────────────────────────────
+// ── Scenes ───────────────────────────────────────────────────────────────────
 const SCENES=[
-  {id:'hook',    s:0,     e:3000 },
-  {id:'videofx', s:3000,  e:11000},
-  {id:'eleven',  s:11000, e:19000},
-  {id:'result',  s:19000, e:25000},
-  {id:'impact',  s:25000, e:29000},
-  {id:'cta',     s:29000, e:35000},
+  {id:'hook',   s:0,     e:3000 },
+  {id:'vfx',    s:3000,  e:9000 },
+  {id:'eleven', s:9000,  e:16000},
+  {id:'benefit',s:16000, e:20000},
+  {id:'cta',    s:20000, e:25000},
 ];
+function getScene(t){
+  for(const s of SCENES)if(t>=s.s&&t<s.e)return s;
+  return SCENES[SCENES.length-1];
+}
 
-// ─── Neural-network particle system ────────────────────────────────────────
-const N_PARTICLES=120;
-const PARTS=Array.from({length:N_PARTICLES},()=>({
+// ── Particle system (VideoFX 배경 시뮬레이션) ─────────────────────────────────
+const NPTS=160;
+const pts=Array.from({length:NPTS},()=>({
   x:Math.random()*W, y:Math.random()*H,
-  r:Math.random()*1.4+.3,
-  vx:(Math.random()-.5)*.35,
-  vy:-(Math.random()*.3+.06),
-  opacity:Math.random()*.35+.08,
+  vx:(Math.random()-.5)*.28, vy:-(Math.random()*.22+.05),
+  r:Math.random()*1.6+.3,
+  op:Math.random()*.38+.06,
+  hue:Math.random()>0.6?260:230, // blue or purple
 }));
 
-function updateParticles(){
-  PARTS.forEach(p=>{
+function tickPts(){
+  pts.forEach(p=>{
     p.x+=p.vx; p.y+=p.vy;
-    if(p.y<-10){p.y=H+10; p.x=Math.random()*W;}
-    if(p.x<-10)p.x=W+10;
-    if(p.x>W+10)p.x=-10;
+    if(p.y<-8){p.y=H+8;p.x=Math.random()*W;}
+    if(p.x<-8)p.x=W+8; if(p.x>W+8)p.x=-8;
   });
 }
 
-function drawNeuralNet(alpha){
-  // connections
-  for(let i=0;i<N_PARTICLES;i++){
-    for(let j=i+1;j<N_PARTICLES;j++){
-      const dx=PARTS[i].x-PARTS[j].x, dy=PARTS[i].y-PARTS[j].y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<140){
-        ctx.save();
-        ctx.globalAlpha=(1-d/140)*.11*alpha;
-        ctx.strokeStyle=C_BLUE;
-        ctx.lineWidth=.8;
-        ctx.beginPath();
-        ctx.moveTo(PARTS[i].x,PARTS[i].y);
-        ctx.lineTo(PARTS[j].x,PARTS[j].y);
-        ctx.stroke();
-        ctx.restore();
-      }
+function drawPts(brightness=1){
+  // neural connections
+  for(let i=0;i<NPTS;i++) for(let j=i+1;j<NPTS;j++){
+    const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+    const d=Math.sqrt(dx*dx+dy*dy);
+    if(d<130){
+      ctx.save();
+      ctx.globalAlpha=(1-d/130)*.1*brightness;
+      ctx.strokeStyle=`hsl(${pts[i].hue},80%,65%)`;
+      ctx.lineWidth=.7;
+      ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();
+      ctx.restore();
     }
   }
   // nodes
-  PARTS.forEach(p=>{
+  pts.forEach(p=>{
     ctx.save();
-    ctx.globalAlpha=p.opacity*alpha;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle='rgba(180,200,255,1)';
-    ctx.fill();
+    ctx.globalAlpha=p.op*brightness;
+    ctx.shadowColor=`hsl(${p.hue},80%,65%)`;
+    ctx.shadowBlur=6;
+    ctx.fillStyle=`hsl(${p.hue},70%,75%)`;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
     ctx.restore();
   });
 }
 
-// ─── Data streams (VideoFX scene) ─────────────────────────────────────────
-const STREAMS=Array.from({length:22},(_,i)=>({
-  x:(i/22)*W+(Math.random()-0.5)*20,
-  y:Math.random()*H,
-  speed:Math.random()*1.8+.8,
-  chars:Array.from({length:18},()=>Math.random()>.5?'1':'0'),
-}));
+// ── Background ────────────────────────────────────────────────────────────────
+function drawBg(t,sceneId){
+  // 심도있는 다크 배경
+  ctx.fillStyle='#07070F';
+  ctx.fillRect(0,0,W,H);
 
-function drawDataStreams(t,alpha){
-  ctx.save();
-  ctx.font=`600 22px ${FONT_EN}`;
-  ctx.textAlign='center';
-  STREAMS.forEach(s=>{
-    s.chars.forEach((c,i)=>{
-      const y=(s.y+i*38+t*s.speed*.1)%H;
-      const a=(1-i/s.chars.length)*.55*alpha;
-      ctx.globalAlpha=a;
-      ctx.fillStyle=`rgba(75,111,255,1)`;
-      ctx.fillText(c,s.x,y);
-    });
-  });
-  ctx.restore();
+  // 씬별 컬러 무드
+  const hue=sceneId==='eleven'?280:sceneId==='benefit'?200:240;
+  const a1=ctx.createRadialGradient(W*.5,H*.3,0,W*.5,H*.3,H*.65);
+  a1.addColorStop(0,`hsla(${hue},60%,15%,.7)`);
+  a1.addColorStop(1,'transparent');
+  ctx.fillStyle=a1; ctx.fillRect(0,0,W,H);
+
+  const a2=ctx.createRadialGradient(W*.15,H*.85,0,W*.15,H*.85,H*.5);
+  a2.addColorStop(0,`hsla(${hue+30},50%,12%,.4)`);
+  a2.addColorStop(1,'transparent');
+  ctx.fillStyle=a2; ctx.fillRect(0,0,W,H);
+
+  // 파티클 (VideoFX 배경 느낌)
+  drawPts(1);
+
+  // 상단/하단 비네트
+  const vT=ctx.createLinearGradient(0,0,0,500);
+  vT.addColorStop(0,'rgba(4,3,14,.88)');vT.addColorStop(1,'transparent');
+  ctx.fillStyle=vT; ctx.fillRect(0,0,W,500);
+
+  const vB=ctx.createLinearGradient(0,H-700,0,H);
+  vB.addColorStop(0,'transparent');vB.addColorStop(1,'rgba(4,3,14,.96)');
+  ctx.fillStyle=vB; ctx.fillRect(0,H-700,W,700);
 }
 
-// ─── Sonar / circular waves (ElevenLabs) ──────────────────────────────────
-function drawSonar(cx,cy,t,alpha){
-  for(let i=0;i<6;i++){
-    const phase=((t*.0008+i*.22)%1);
-    const r=phase*480;
-    const a=(1-phase)*alpha*.45;
-    ctx.save();
-    ctx.globalAlpha=a;
-    ctx.strokeStyle=i%2===0?C_BLUE:C_PURPLE;
-    ctx.lineWidth=1.5;
-    ctx.beginPath();
-    ctx.arc(cx,cy,r,0,Math.PI*2);
-    ctx.stroke();
-    ctx.restore();
-  }
-}
-
-// ─── Scan-line reveal (Result) ─────────────────────────────────────────────
-function drawScanReveal(progress){
-  // bright horizontal band
-  const scanY=H*progress;
-  ctx.save();
-  const grad=ctx.createLinearGradient(0,scanY-80,0,scanY+6);
-  grad.addColorStop(0,'transparent');
-  grad.addColorStop(.7,'rgba(75,111,255,.18)');
-  grad.addColorStop(1,'rgba(180,200,255,.55)');
-  ctx.fillStyle=grad;
-  ctx.fillRect(0,scanY-80,W,86);
-  ctx.restore();
-}
-
-// ─── Glitch text ──────────────────────────────────────────────────────────
-function drawGlitch(text,cx,cy,font,glitch){
-  ctx.font=font;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  if(glitch>0){
-    const off=glitch*14;
-    ctx.save();
-    ctx.globalAlpha=.55;
-    ctx.fillStyle='rgba(255,30,100,1)';
-    ctx.fillText(text,cx-off,cy+2);
-    ctx.fillStyle='rgba(0,220,255,1)';
-    ctx.fillText(text,cx+off,cy-2);
-    ctx.restore();
-  }
-  ctx.fillStyle=C_WHITE;
-  ctx.fillText(text,cx,cy);
-}
-
-// ─── Gradient text ────────────────────────────────────────────────────────
-function gradText(text,cx,cy,font,c0,c1){
-  ctx.font=font;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
+// ── Text utilities ────────────────────────────────────────────────────────────
+function gText(text,cx,cy,font,c0,c1){
+  ctx.font=font; ctx.textAlign='center'; ctx.textBaseline='middle';
   const tw=ctx.measureText(text).width;
   const g=ctx.createLinearGradient(cx-tw/2,0,cx+tw/2,0);
   g.addColorStop(0,c0); g.addColorStop(1,c1);
-  ctx.fillStyle=g;
-  ctx.fillText(text,cx,cy);
+  ctx.fillStyle=g; ctx.fillText(text,cx,cy);
 }
 
-// ─── Neon glow text ───────────────────────────────────────────────────────
-function neonText(text,cx,cy,font,color,blur){
+function glitch(text,cx,cy,font,gi){
+  ctx.font=font; ctx.textAlign='center'; ctx.textBaseline='middle';
+  if(gi>0){
+    const off=gi*16;
+    ctx.save(); ctx.globalAlpha=.5;
+    ctx.fillStyle='rgba(255,30,100,1)'; ctx.fillText(text,cx-off,cy+3);
+    ctx.fillStyle='rgba(0,210,255,1)';  ctx.fillText(text,cx+off,cy-3);
+    ctx.restore();
+  }
+  ctx.fillStyle='#fff'; ctx.fillText(text,cx,cy);
+}
+
+function neon(text,cx,cy,font,color,blur){
   ctx.save();
-  ctx.font=font;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.shadowColor=color;
-  ctx.shadowBlur=blur;
-  ctx.fillStyle=color;
-  ctx.fillText(text,cx,cy);
-  ctx.shadowBlur=blur*.5;
-  ctx.fillStyle=C_WHITE;
-  ctx.fillText(text,cx,cy);
+  ctx.font=font; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.shadowColor=color; ctx.shadowBlur=blur;
+  ctx.fillStyle=color; ctx.fillText(text,cx,cy);
+  ctx.shadowBlur=blur*.4; ctx.fillStyle='#fff'; ctx.fillText(text,cx,cy);
   ctx.restore();
 }
 
-// ─── Particle explosion ───────────────────────────────────────────────────
-let BOOM_PARTS=[];
-function triggerExplosion(cx,cy){
-  BOOM_PARTS=Array.from({length:80},()=>({
-    x:cx, y:cy,
-    vx:(Math.random()-.5)*22,
-    vy:(Math.random()-.5)*22,
-    r:Math.random()*4+1.5,
+// ── Badge ─────────────────────────────────────────────────────────────────────
+function badge(){
+  const txt='@ai.saver_', px=76,py=74,h=56,pad=28;
+  ctx.save();
+  ctx.font=`600 27px ${FEN}`;
+  const tw=ctx.measureText(txt).width;
+  ctx.beginPath(); ctx.roundRect(px,py,tw+pad*2,h,h/2);
+  ctx.fillStyle='rgba(255,255,255,.07)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.18)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(txt,px+pad,py+h/2);
+  ctx.restore();
+}
+
+// ── Scan-line reveal ──────────────────────────────────────────────────────────
+function scanReveal(p){
+  const y=H*p;
+  ctx.save();
+  const g=ctx.createLinearGradient(0,y-90,0,y+8);
+  g.addColorStop(0,'transparent');
+  g.addColorStop(.65,'rgba(75,111,255,.14)');
+  g.addColorStop(1,'rgba(160,190,255,.5)');
+  ctx.fillStyle=g; ctx.fillRect(0,y-90,W,98);
+  ctx.restore();
+}
+
+// ── Explosion ─────────────────────────────────────────────────────────────────
+let boom=[], boomDone=false;
+function triggerBoom(cx,cy){
+  boom=Array.from({length:90},()=>({
+    x:cx,y:cy,
+    vx:(Math.random()-.5)*24,
+    vy:(Math.random()-.5)*24,
+    r:Math.random()*4+1,
     life:1,
-    color:Math.random()>.5?C_BLUE:C_PURPLE,
+    col:Math.random()>.5?'#4B6FFF':'#A78BFA',
   }));
 }
-function drawExplosion(){
-  BOOM_PARTS=BOOM_PARTS.filter(p=>p.life>0);
-  BOOM_PARTS.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy;
-    p.vy+=.35; p.life-=.025;
+function drawBoom(){
+  boom=boom.filter(p=>p.life>0);
+  boom.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.4; p.life-=.024;
     ctx.save();
     ctx.globalAlpha=p.life;
-    ctx.fillStyle=p.color;
-    ctx.shadowColor=p.color;
-    ctx.shadowBlur=12;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fill();
+    ctx.shadowColor=p.col; ctx.shadowBlur=10;
+    ctx.fillStyle=p.col;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
     ctx.restore();
   });
 }
 
-// ─── Glass card ───────────────────────────────────────────────────────────
-function drawCard(x,y,w,h,r,fill,shadow){
-  ctx.save();
-  ctx.shadowColor=shadow; ctx.shadowBlur=40;
-  ctx.fillStyle=fill;
-  ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.strokeStyle='rgba(120,160,255,.2)';
-  ctx.lineWidth=1.5;
-  ctx.stroke();
-  ctx.restore();
-}
+// ── ★ SCENES ★ ────────────────────────────────────────────────────────────────
 
-// ─── Arrow ────────────────────────────────────────────────────────────────
-function drawArrow(x1,y,x2,alpha){
-  ctx.save();
-  ctx.globalAlpha=alpha;
-  ctx.strokeStyle='rgba(75,111,255,.55)';
-  ctx.lineWidth=2; ctx.setLineDash([8,7]);
-  ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2-18,y); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle='rgba(75,111,255,.8)';
-  ctx.beginPath(); ctx.moveTo(x2,y); ctx.lineTo(x2-18,y-9); ctx.lineTo(x2-18,y+9); ctx.closePath(); ctx.fill();
-  ctx.restore();
-}
-
-// ─── Mic (canvas) ─────────────────────────────────────────────────────────
-function drawMic(cx,cy,size,alpha){
-  const bw=size*.30, bh=size*.46;
-  ctx.save();
-  ctx.globalAlpha=alpha;
-  ctx.shadowColor=C_BLUE; ctx.shadowBlur=size*.38;
-  ctx.fillStyle='rgba(200,210,255,.9)';
-  ctx.beginPath(); ctx.roundRect(cx-bw/2,cy-bh*.65,bw,bh,bw/2); ctx.fill();
-  ctx.shadowBlur=0;
-  ctx.strokeStyle='rgba(200,210,255,.8)';
-  ctx.lineWidth=size*.04; ctx.lineCap='round';
-  ctx.beginPath(); ctx.arc(cx,cy-bh*.15,bw*.88,Math.PI,0,false); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx,cy-bh*.15+bw*.88); ctx.lineTo(cx,cy+bh*.38); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx-bw*.72,cy+bh*.38); ctx.lineTo(cx+bw*.72,cy+bh*.38); ctx.stroke();
-  ctx.restore();
-}
-
-// ─── Waveform bars ────────────────────────────────────────────────────────
-const BAR_H=[40,60,90,130,100,160,200,170,240,200,280,300,260,300,280,260,300,280,240,200,170,240,200,160,130,100,90,60,40,30,50,80,110,90,140,180,220,180,260,300,280,300,260,300,280,260,300,280,240,200,170,140,110,80,50];
-function drawWave(cx,cy,alpha,t){
-  const bW=9,gap=7;
-  const total=BAR_H.length*bW+(BAR_H.length-1)*gap;
-  const sx=cx-total/2;
-  ctx.save(); ctx.globalAlpha=alpha;
-  BAR_H.forEach((h,i)=>{
-    const ah=h*(0.5+0.5*Math.sin(t*.003+i*.32));
-    const bx=sx+i*(bW+gap), by=cy-ah/2;
-    const g=ctx.createLinearGradient(0,by+ah,0,by);
-    g.addColorStop(0,C_BLUE); g.addColorStop(1,C_PURPLE);
-    ctx.fillStyle=g;
-    ctx.beginPath(); ctx.roundRect(bx,by,bW,ah,bW/2); ctx.fill();
-  });
-  ctx.restore();
-}
-
-// ─── Background ───────────────────────────────────────────────────────────
-function drawBg(){
-  ctx.fillStyle='#07070F'; ctx.fillRect(0,0,W,H);
-  const a1=ctx.createRadialGradient(W*.5,0,0,W*.5,0,H*.72);
-  a1.addColorStop(0,'rgba(18,12,64,.9)'); a1.addColorStop(1,'transparent');
-  ctx.fillStyle=a1; ctx.fillRect(0,0,W,H);
-  const a2=ctx.createRadialGradient(W*.15,H,0,W*.15,H,H*.5);
-  a2.addColorStop(0,'rgba(0,50,130,.22)'); a2.addColorStop(1,'transparent');
-  ctx.fillStyle=a2; ctx.fillRect(0,0,W,H);
-  const vT=ctx.createLinearGradient(0,0,0,420);
-  vT.addColorStop(0,'rgba(4,3,18,.9)'); vT.addColorStop(1,'transparent');
-  ctx.fillStyle=vT; ctx.fillRect(0,0,W,420);
-  const vB=ctx.createLinearGradient(0,H-800,0,H);
-  vB.addColorStop(0,'transparent'); vB.addColorStop(1,'rgba(4,3,18,.97)');
-  ctx.fillStyle=vB; ctx.fillRect(0,H-800,W,800);
-}
-
-// ─── Channel badge ────────────────────────────────────────────────────────
-function drawBadge(){
-  const text='@ai.saver_', px=80,py=76,h=58,pad=30;
-  ctx.save();
-  ctx.font=`600 28px ${FONT_EN}`;
-  const tw=ctx.measureText(text).width;
-  ctx.beginPath(); ctx.roundRect(px,py,tw+pad*2,h,h/2);
-  ctx.fillStyle='rgba(255,255,255,.06)'; ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.16)'; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.fillStyle='rgba(255,255,255,.84)';
-  ctx.textAlign='left'; ctx.textBaseline='middle';
-  ctx.fillText(text,px+pad,py+h/2);
-  ctx.restore();
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// SCENES
-// ─────────────────────────────────────────────────────────────────────────
-
-// ① HOOK — 글리치 텍스트
+// ① HOOK — 반전 후킹 (글리치)
 function drawHook(e){
-  const cx=W/2,cy=H*.47;
-  const l1=clamp(e/600,0,1);
-  const l2=clamp((e-650)/600,0,1);
-  const l3=clamp((e-1300)/600,0,1);
-  const sub=clamp((e-2100)/500,0,1);
-  // glitch 강도 — 등장 직후 흔들림, 이후 안정
-  const glitch1=l2>0&&l2<.4?(1-l2/.4)*.8:0;
-  const glitch2=l3>0&&l3<.4?(1-l3/.4)*.8:0;
+  const cx=W/2, cy=H*.47;
+  const l1=clamp(e/650,0,1);
+  const l2=clamp((e-700)/600,0,1);
+  const l3=clamp((e-1350)/650,0,1);
+  const gi2=l2>0&&l2<.35?(1-l2/.35)*.9:0;
+  const gi3=l3>0&&l3<.35?(1-l3/.35)*.9:0;
 
   if(l1>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l1);
-    ctx.font=`400 46px ${FONT_KR}`;
-    ctx.fillStyle='rgba(150,170,255,.72)';
+    ctx.save(); ctx.globalAlpha=eO(l1);
+    ctx.font=`400 48px ${FKR}`; ctx.fillStyle='rgba(160,180,255,.68)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('사실 이 영상,',cx,cy-200);
+    ctx.fillText('사실 이 영상,',cx,cy-218);
     ctx.restore();
   }
   if(l2>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l2);
-    ctx.shadowColor=C_BLUE; ctx.shadowBlur=50;
-    drawGlitch('찍은 게',cx,cy-50,`900 168px ${FONT_KR}`,glitch1);
+    ctx.save(); ctx.globalAlpha=eO(l2);
+    ctx.shadowColor='#4B6FFF'; ctx.shadowBlur=55;
+    glitch('찍은 게',cx,cy-48,`900 172px ${FKR}`,gi2);
     ctx.restore();
   }
   if(l3>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l3);
-    ctx.shadowColor=C_PURPLE; ctx.shadowBlur=70;
-    // gradient version
-    const tw=ctx.measureText && (() => { ctx.font=`900 160px ${FONT_KR}`; return ctx.measureText('아닙니다.').width; })();
-    drawGlitch('아닙니다.',cx,cy+115,`900 160px ${FONT_KR}`,glitch2);
+    ctx.save(); ctx.globalAlpha=eO(l3);
+    ctx.shadowColor='#8B5CF6'; ctx.shadowBlur=75;
+    glitch('아닙니다.',cx,cy+132,`900 158px ${FKR}`,gi3);
     ctx.restore();
   }
+  const sub=clamp((e-2150)/550,0,1);
   if(sub>0){
-    ctx.save(); ctx.globalAlpha=easeOut(sub)*.65;
-    ctx.font=`400 44px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
+    ctx.save(); ctx.globalAlpha=eO(sub)*.62;
+    ctx.font=`400 45px ${FKR}`; ctx.fillStyle='#fff';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('목소리도요.',cx,cy+270);
+    ctx.fillText('목소리도요.',cx,cy+278);
     ctx.restore();
   }
-  // waveform subtle
-  const wv=clamp((e-2400)/400,0,1);
-  if(wv>0) drawWave(cx,H*.83,easeOut(wv)*.16,e);
 }
 
-// ② VIDEOFX — 데이터 스트림 + 카드
-function drawVideoFX(e){
-  const cx=W/2,cy=H*.44;
-  const cW=920,cH=600,cX=cx-cW/2;
-  const eyeT=clamp(e/400,0,1);
-  const cardT=clamp((e-350)/650,0,1);
-  const s1T=clamp((e-1100)/600,0,1);
-  const arrT=clamp((e-1800)/500,0,1);
-  const s2T=clamp((e-2400)/600,0,1);
-  const descT=clamp((e-3200)/600,0,1);
-  const strmT=clamp((e-600)/1000,0,1);
-  const cY=cy-cH/2+lerp(70,0,easeOut(cardT));
+// ② VIDEOFX — 풀스크린 텍스트 오버레이 (카드 없음)
+function drawVFX(e){
+  const cx=W/2, cy=H*.47;
+  const step=clamp(e/500,0,1);
+  const t1=clamp((e-500)/700,0,1);
+  const t2=clamp((e-1400)/700,0,1);
+  const t3=clamp((e-2300)/700,0,1);
+  const t4=clamp((e-3400)/700,0,1);
 
-  // data streams bg
-  if(strmT>0) drawDataStreams(e,easeOut(strmT)*.4);
+  // 데이터 스트림 강화
+  if(step>0){
+    const alpha=eO(step)*.5;
+    ctx.save();
+    ctx.font=`700 22px ${FEN}`; ctx.textAlign='center';
+    for(let i=0;i<18;i++){
+      const x=(i/18)*W+24;
+      for(let j=0;j<14;j++){
+        const y=(j*52+e*((i%3===0?1.2:0.8))*0.065)%H;
+        ctx.globalAlpha=(1-j/14)*alpha;
+        ctx.fillStyle=`rgba(75,111,255,1)`;
+        ctx.fillText(Math.random()>.5?'1':'0',x,y);
+      }
+    }
+    ctx.restore();
+  }
 
-  if(eyeT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(eyeT);
-    ctx.font=`700 30px ${FONT_EN}`;
-    ctx.fillStyle='rgba(150,170,255,.62)';
+  if(step>0){
+    ctx.save(); ctx.globalAlpha=eO(step);
+    ctx.font=`700 34px ${FEN}`; ctx.fillStyle='rgba(150,170,255,.6)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('STEP 01',cx,cY-52);
+    ctx.letterSpacing='0.2em';
+    ctx.fillText('STEP 01  ·  VideoFX',cx,cy-310);
     ctx.restore();
   }
-  if(cardT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(cardT);
-    drawCard(cX,cY,cW,cH,32,'rgba(18,14,48,.78)','rgba(75,111,255,.18)');
+  if(t1>0){
+    ctx.save(); ctx.globalAlpha=eO(t1);
+    ctx.shadowColor='#4B6FFF'; ctx.shadowBlur=40;
+    gText('배경 영상',cx,cy-160,`900 138px ${FKR}`,'#6B8FFF','#A78BFA');
     ctx.restore();
   }
-  if(s1T>0){
-    ctx.save(); ctx.globalAlpha=easeOut(s1T);
-    ctx.shadowColor=C_BLUE; ctx.shadowBlur=36;
-    gradText('VideoFX',cx,cY+128,`900 102px ${FONT_EN}`,'#6B8FFF','#A78BFA');
+  if(t2>0){
+    ctx.save(); ctx.globalAlpha=eO(t2);
+    ctx.shadowColor='#4B6FFF'; ctx.shadowBlur=30;
+    gText('AI가 만든다',cx,cy+10,`900 138px ${FKR}`,'#A78BFA','#6B8FFF');
     ctx.restore();
   }
-  if(arrT>0) drawArrow(cX+80,cY+248,cX+cW-80,easeOut(arrT));
-  if(s2T>0){
-    ctx.save(); ctx.globalAlpha=easeOut(s2T);
-    ctx.font=`700 54px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
+  if(t3>0){
+    ctx.save(); ctx.globalAlpha=eO(t3)*.72;
+    ctx.font=`400 46px ${FKR}`; ctx.fillStyle='rgba(255,255,255,.8)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('AI가 배경 영상 생성',cx,cY+360);
+    ctx.fillText('텍스트 한 줄 → 10초 영상',cx,cy+172);
     ctx.restore();
   }
-  if(descT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(descT)*.58;
-    ctx.font=`400 36px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
+  if(t4>0){
+    ctx.save(); ctx.globalAlpha=eO(t4)*.55;
+    ctx.font=`400 38px ${FKR}`; ctx.fillStyle='rgba(150,170,255,.8)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('텍스트 한 줄로 원하는 영상이 나온다',cx,cY+460);
+    ctx.fillText('촬영 장비 0원 · 편집 실력 0점',cx,cy+268);
     ctx.restore();
   }
-  const wvT=clamp((e-4500)/600,0,1);
-  if(wvT>0) drawWave(cx,H*.83,easeOut(wvT)*.18,e);
 }
 
-// ③ ELEVENLABS — 소나 파형 + 마이크
-function drawElevenLabs(e){
-  const cx=W/2,cy=H*.44;
-  const cW=920,cH=660,cX=cx-cW/2;
-  const eyeT=clamp(e/400,0,1);
-  const cardT=clamp((e-300)/650,0,1);
-  const sonarT=clamp((e-800)/600,0,1);
-  const micT=clamp((e-1000)/800,0,1);
-  const s1T=clamp((e-1900)/600,0,1);
-  const arrT=clamp((e-2600)/500,0,1);
-  const s2T=clamp((e-3200)/600,0,1);
-  const descT=clamp((e-4000)/600,0,1);
-  const cY=cy-cH/2+lerp(70,0,easeOut(cardT));
+// ③ ELEVENLABS — 소나 파형 + 풀스크린 텍스트
+function drawEleven(e){
+  const cx=W/2, cy=H*.47;
+  // 소나 파형 (배경)
+  for(let i=0;i<7;i++){
+    const ph=((e*.00075+i*.18)%1);
+    const r=ph*520;
+    const al=(1-ph)*0.38;
+    ctx.save();
+    ctx.globalAlpha=al;
+    ctx.strokeStyle=i%2===0?'#4B6FFF':'#8B5CF6';
+    ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.arc(cx,cy-30,r,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+  }
 
-  if(eyeT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(eyeT);
-    ctx.font=`700 30px ${FONT_EN}`;
-    ctx.fillStyle='rgba(167,139,250,.65)';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('STEP 02',cx,cY-52);
-    ctx.restore();
-  }
-  if(cardT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(cardT);
-    drawCard(cX,cY,cW,cH,32,'rgba(26,12,56,.78)','rgba(139,92,246,.22)');
-    ctx.restore();
-  }
-  // sonar waves behind mic
-  if(sonarT>0) drawSonar(cx,cY+110,e,easeOut(sonarT));
-  if(micT>0) drawMic(cx,cY+110,140,easeOut(micT));
+  const step=clamp(e/500,0,1);
+  const t1=clamp((e-500)/700,0,1);
+  const t2=clamp((e-1400)/700,0,1);
+  const t3=clamp((e-2400)/700,0,1);
+  const t4=clamp((e-3600)/700,0,1);
 
-  if(s1T>0){
-    ctx.save(); ctx.globalAlpha=easeOut(s1T);
-    ctx.shadowColor=C_PURPLE; ctx.shadowBlur=36;
-    gradText('ElevenLabs',cx,cY+292,`900 92px ${FONT_EN}`,'#A78BFA','#6B8FFF');
-    ctx.restore();
-  }
-  if(arrT>0) drawArrow(cX+80,cY+392,cX+cW-80,easeOut(arrT));
-  if(s2T>0){
-    ctx.save(); ctx.globalAlpha=easeOut(s2T);
-    ctx.font=`700 54px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
+  if(step>0){
+    ctx.save(); ctx.globalAlpha=eO(step);
+    ctx.font=`700 34px ${FEN}`; ctx.fillStyle='rgba(167,139,250,.6)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('AI가 내 목소리 복제',cx,cY+492);
+    ctx.fillText('STEP 02  ·  ElevenLabs',cx,cy-310);
     ctx.restore();
   }
-  if(descT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(descT)*.58;
-    ctx.font=`400 36px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
+  if(t1>0){
+    ctx.save(); ctx.globalAlpha=eO(t1);
+    ctx.shadowColor='#8B5CF6'; ctx.shadowBlur=44;
+    gText('내 목소리를',cx,cy-150,`900 138px ${FKR}`,'#A78BFA','#6B8FFF');
+    ctx.restore();
+  }
+  if(t2>0){
+    ctx.save(); ctx.globalAlpha=eO(t2);
+    ctx.shadowColor='#8B5CF6'; ctx.shadowBlur=44;
+    gText('AI가 복제한다',cx,cy+18,`900 130px ${FKR}`,'#6B8FFF','#A78BFA');
+    ctx.restore();
+  }
+  if(t3>0){
+    ctx.save(); ctx.globalAlpha=eO(t3)*.72;
+    ctx.font=`400 46px ${FKR}`; ctx.fillStyle='rgba(255,255,255,.8)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('학습 데이터 30초면 충분',cx,cY+580);
+    ctx.fillText('30초 녹음 → 목소리 클론 완성',cx,cy+178);
     ctx.restore();
   }
-  const wvT=clamp((e-5000)/600,0,1);
-  if(wvT>0) drawWave(cx,H*.84,easeOut(wvT)*.22,e);
+  if(t4>0){
+    ctx.save(); ctx.globalAlpha=eO(t4)*.55;
+    ctx.font=`400 38px ${FKR}`; ctx.fillStyle='rgba(167,139,250,.8)';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('나레이션 · 유튜브 · 릴스 전부 가능',cx,cy+268);
+    ctx.restore();
+  }
 }
 
-// ④ RESULT — 스캔라인 리빌
-function drawResult(e){
-  const cx=W/2,cy=H*.46;
-  const dur=6000;
-  const scanProg=clamp(e/2200,0,1);
-  const l1=clamp(e/600,0,1);
-  const l2=clamp((e-700)/700,0,1);
-  const l3=clamp((e-2000)/700,0,1);
-  const wvT=clamp((e-3200)/600,0,1);
+// ④ BENEFIT — 스캔 리빌 + 3가지 NO
+function drawBenefit(e){
+  const cx=W/2, cy=H*.45;
+  const sp=clamp(e/1800,0,1);
+  if(sp<1) scanReveal(eIO(sp));
 
-  // scan reveal
-  if(scanProg<1) drawScanReveal(easeInOut(scanProg));
+  const items=[
+    {text:'촬영 NO', t:clamp(e/600,0,1)},
+    {text:'녹음 NO',  t:clamp((e-700)/600,0,1)},
+    {text:'편집 NO',  t:clamp((e-1400)/600,0,1)},
+  ];
+  const yPos=[cy-200, cy-30, cy+140];
+
+  items.forEach(({text,t},i)=>{
+    if(t>0){
+      const slide=lerp(60,0,eO(t));
+      ctx.save();
+      ctx.globalAlpha=eO(t);
+      ctx.translate(0,slide);
+      ctx.shadowColor='#4B6FFF'; ctx.shadowBlur=50;
+      gText(text,cx,yPos[i],`900 156px ${FKR}`,'#6B8FFF','#A78BFA');
+      ctx.restore();
+    }
+  });
+
+  const sub=clamp((e-2500)/500,0,1);
+  if(sub>0){
+    ctx.save(); ctx.globalAlpha=eO(sub)*.7;
+    ctx.font=`400 42px ${FKR}`; ctx.fillStyle='rgba(255,255,255,.8)';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('세팅 10분이면 충분',cx,cy+300);
+    ctx.restore();
+  }
+}
+
+// ⑤ CTA — 카운터 + 네온 펄스
+let cntDone=false;
+function drawCTA(e){
+  const cx=W/2, cy=H*.45;
+  const num=Math.min(Math.round(lerp(0,10,eO(clamp(e/900,0,1)))),10);
+
+  if(num===10&&!cntDone){triggerBoom(cx,cy-100); cntDone=true;}
+  drawBoom();
+
+  const l1=clamp(e/450,0,1);
+  const l2=clamp((e-500)/600,0,1);
+  const l3=clamp((e-1200)/600,0,1);
+  const l4=clamp((e-2100)/600,0,1);
+  const pulse=.55+.45*Math.sin(e*.0045);
 
   if(l1>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l1);
-    ctx.font=`400 50px ${FONT_KR}`; ctx.fillStyle='rgba(150,170,255,.72)';
+    ctx.save(); ctx.globalAlpha=eO(l1);
+    ctx.font=`400 48px ${FKR}`; ctx.fillStyle='rgba(160,180,255,.65)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('결과:',cx,cy-230);
+    ctx.fillText('세팅에 걸린 시간',cx,cy-270);
+    ctx.restore();
+  }
+  if(l1>0){
+    ctx.save(); ctx.globalAlpha=eO(l1);
+    const pop=l1<.6?lerp(.6,1.1,eO(l1/.6)):lerp(1.1,1,eO((l1-.6)/.4));
+    ctx.translate(cx,cy-80); ctx.scale(pop,pop);
+    ctx.shadowColor='#4B6FFF'; ctx.shadowBlur=110;
+    gText(String(num),0,0,`900 310px ${FEN}`,'#6B8FFF','#A78BFA');
     ctx.restore();
   }
   if(l2>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l2);
-    ctx.shadowColor=C_BLUE; ctx.shadowBlur=56;
-    ctx.font=`900 128px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
+    ctx.save(); ctx.globalAlpha=eO(l2);
+    ctx.font=`900 86px ${FKR}`; ctx.fillStyle='#fff';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('내가 없어도',cx,cy-80);
+    ctx.fillText('분이면 끝',cx,cy+130);
     ctx.restore();
   }
   if(l3>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l3);
-    ctx.shadowColor=C_PURPLE; ctx.shadowBlur=64;
-    gradText('내 콘텐츠가',cx,cy+150,`900 106px ${FONT_KR}`,'#6B8FFF','#A78BFA');
-    gradText('나온다',cx,cy+278,`900 106px ${FONT_KR}`,'#6B8FFF','#A78BFA');
+    const glow=38+pulse*32;
+    ctx.save(); ctx.globalAlpha=eO(l3);
+    neon('댓글에 "목소리"',cx,cy+268,`900 80px ${FKR}`,'rgba(75,111,255,1)',glow);
     ctx.restore();
   }
-  if(wvT>0) drawWave(cx,H*.84,easeOut(wvT)*.2,e);
-}
-
-// ⑤ IMPACT — 카운터 + 파티클 버스트
-let boomTriggered=false;
-function drawImpact(e){
-  const cx=W/2,cy=H*.46;
-  const l1=clamp(e/500,0,1);
-  const numT=clamp((e-550)/700,0,1);
-  const l2=clamp((e-1350)/600,0,1);
-  const subT=clamp((e-2000)/600,0,1);
-
-  // counter 0→10
-  const displayNum=Math.floor(lerp(0,10,easeOut(clamp((e-550)/900,0,1))));
-  if(e>=550 && displayNum===10 && !boomTriggered){
-    triggerExplosion(cx,cy-40); boomTriggered=true;
-  }
-  drawExplosion();
-
-  if(l1>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l1);
-    ctx.font=`400 52px ${FONT_KR}`; ctx.fillStyle='rgba(150,170,255,.7)';
+  if(l4>0){
+    ctx.save(); ctx.globalAlpha=eO(l4)*.7;
+    ctx.font=`400 40px ${FKR}`; ctx.fillStyle='rgba(255,255,255,.85)';
     ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('세팅에 걸린 시간:',cx,cy-230);
-    ctx.restore();
-  }
-  if(numT>0){
-    const pop=numT<.6?lerp(.65,1.1,easeOut(numT/.6)):lerp(1.1,1.0,easeOut((numT-.6)/.4));
-    ctx.save(); ctx.globalAlpha=easeOut(numT);
-    ctx.translate(cx,cy-40); ctx.scale(pop,pop);
-    ctx.shadowColor=C_BLUE; ctx.shadowBlur=100;
-    gradText(String(displayNum),0,0,`900 300px ${FONT_EN}`,'#6B8FFF','#A78BFA');
-    ctx.restore();
-  }
-  if(l2>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l2);
-    ctx.font=`700 84px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('분',cx+80,cy+130);
-    ctx.restore();
-  }
-  if(subT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(subT);
-    neonText('진짜임.',cx,cy+268,`900 76px ${FONT_KR}`,'rgba(150,170,255,1)',30);
+    ctx.fillText('세팅법 DM 드릴게요',cx,cy+385);
     ctx.restore();
   }
 }
 
-// ⑥ CTA — 네온 글로우 키워드
-function drawCTA(e){
-  const cx=W/2,cy=H*.45;
-  const l1=clamp(e/500,0,1);
-  const l2=clamp((e-600)/650,0,1);
-  const cardT=clamp((e-1400)/800,0,1);
-  const kwT=clamp((e-2400)/650,0,1);
-  const flwT=clamp((e-3300)/600,0,1);
-  const pulse=.5+.5*Math.sin(e*.004); // 네온 펄스
-
-  if(l1>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l1);
-    ctx.font=`400 46px ${FONT_KR}`; ctx.fillStyle='rgba(150,170,255,.7)';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('세팅법 드릴게요',cx,cy-310);
-    ctx.restore();
-  }
-  if(l2>0){
-    ctx.save(); ctx.globalAlpha=easeOut(l2);
-    ctx.shadowColor=C_BLUE; ctx.shadowBlur=44;
-    ctx.font=`900 106px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('댓글에 \u2193',cx,cy-180);
-    ctx.restore();
-  }
-  if(cardT>0){
-    const kW=720,kH=158,kX=cx-kW/2,kY=cy-kH/2+lerp(36,0,easeOut(cardT))-20;
-    ctx.save(); ctx.globalAlpha=easeOut(cardT);
-    ctx.shadowColor=C_BLUE; ctx.shadowBlur=44;
-    const g=ctx.createLinearGradient(kX,0,kX+kW,0);
-    g.addColorStop(0,'rgba(75,111,255,.28)'); g.addColorStop(1,'rgba(139,92,246,.28)');
-    ctx.fillStyle=g;
-    ctx.beginPath(); ctx.roundRect(kX,kY+30,kW,kH,24); ctx.fill();
-    ctx.strokeStyle='rgba(120,160,255,.3)'; ctx.lineWidth=1.5; ctx.stroke();
-    ctx.restore();
-  }
-  if(kwT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(kwT);
-    const glow=40+pulse*30;
-    neonText('"\uBAA9\uC18C\uB9AC"',cx,cy+100,`900 96px ${FONT_KR}`,C_BLUE,glow);
-    ctx.restore();
-  }
-  if(flwT>0){
-    ctx.save(); ctx.globalAlpha=easeOut(flwT)*.72;
-    ctx.font=`400 40px ${FONT_KR}`; ctx.fillStyle=C_WHITE;
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('\uD314\uB85C\uC6B0\uD558\uACE0 \uB313\uAE00 \uB0A8\uACA8\uC8FC\uC138\uC694',cx,cy+262);
-    ctx.restore();
-  }
-}
-
-// ─── Main loop ────────────────────────────────────────────────────────────
-let startTime=null, animId=null, isPlaying=false;
-function getScene(t){ for(const s of SCENES)if(t>=s.s&&t<s.e)return s; return SCENES[SCENES.length-1]; }
+// ── Render loop ───────────────────────────────────────────────────────────────
+let st=null, aid=null, playing=false;
 
 function render(now){
-  if(!startTime)startTime=now;
-  const elapsed=now-startTime;
-  const t=Math.min(elapsed,TOTAL);
-
-  updateParticles();
-  drawBg();
-  drawNeuralNet(1);  // neural net always on
-  drawBadge();
-
+  if(!st)st=now;
+  const el=now-st, t=Math.min(el,TOTAL);
+  tickPts();
   const sc=getScene(t), se=t-sc.s;
+  drawBg(t,sc.id);
+  badge();
   if(sc.id==='hook')    drawHook(se);
-  if(sc.id==='videofx') drawVideoFX(se);
-  if(sc.id==='eleven')  drawElevenLabs(se);
-  if(sc.id==='result')  drawResult(se);
-  if(sc.id==='impact')  drawImpact(se);
+  if(sc.id==='vfx')     drawVFX(se);
+  if(sc.id==='eleven')  drawEleven(se);
+  if(sc.id==='benefit') drawBenefit(se);
   if(sc.id==='cta')     drawCTA(se);
-
   if(t<TOTAL){
-    animId=requestAnimationFrame(render);
+    aid=requestAnimationFrame(render);
   } else {
-    if(window._recStopCb){window._recStopCb();window._recStopCb=null;}
-    isPlaying=false;
+    if(window._rc){window._rc();window._rc=null;}
+    playing=false;
     document.getElementById('btnPlay').textContent='\u25B6 재생';
     document.getElementById('btnRec').disabled=false;
-    document.getElementById('btnRec').textContent='\u23FA 녹화 시작';
+    document.getElementById('btnRec').textContent='\u23FA 녹화';
   }
 }
 
 function play(){
-  if(animId)cancelAnimationFrame(animId);
-  startTime=null; isPlaying=true;
-  boomTriggered=false; BOOM_PARTS=[];
-  PARTS.forEach(p=>{p.y=Math.random()*H;});
-  animId=requestAnimationFrame(render);
+  if(aid)cancelAnimationFrame(aid);
+  st=null; playing=true; cntDone=false; boom=[];
+  pts.forEach(p=>{p.y=Math.random()*H;});
+  aid=requestAnimationFrame(render);
 }
 
 document.getElementById('btnPlay').addEventListener('click',()=>{
-  if(isPlaying){cancelAnimationFrame(animId);isPlaying=false;document.getElementById('btnPlay').textContent='\u25B6 재생';}
+  if(playing){cancelAnimationFrame(aid);playing=false;document.getElementById('btnPlay').textContent='\u25B6 재생';}
   else{play();document.getElementById('btnPlay').textContent='\u23F9 정지';}
 });
+
 document.getElementById('btnRec').addEventListener('click',()=>{
-  const stream=canvas.captureStream(FPS);
+  const stream=cv.captureStream(FPS);
   const mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
   const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:BITRATE});
   const chunks=[];
   rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
   rec.onstop=()=>{
-    const blob=new Blob(chunks,{type:mime});
     const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='reels_elevenlabs_videofx.webm';
-    a.click();
+    a.href=URL.createObjectURL(new Blob(chunks,{type:mime}));
+    a.download='reels_elevenlabs_videofx.webm'; a.click();
   };
-  window._recStopCb=()=>{rec.stop();};
-  setTimeout(()=>{if(window._recStopCb){window._recStopCb();window._recStopCb=null;}},TOTAL+1500);
+  window._rc=()=>{rec.stop();};
+  setTimeout(()=>{if(window._rc){window._rc();window._rc=null;}},TOTAL+1500);
   rec.start(); play();
   document.getElementById('btnPlay').textContent='\u23F9 정지';
   document.getElementById('btnRec').textContent='\u23FA 녹화 중...';
   document.getElementById('btnRec').disabled=true;
 });
 
-// initial frame
-requestAnimationFrame(now=>{
-  startTime=now-80; updateParticles(); drawBg(); drawNeuralNet(1); drawBadge(); drawHook(80); startTime=null;
-});
+// 첫 프레임 렌더
+requestAnimationFrame(n=>{st=n-80;tickPts();const sc=getScene(80);drawBg(80,sc.id);badge();drawHook(80);st=null;});
 </script>
 </body>
 </html>
