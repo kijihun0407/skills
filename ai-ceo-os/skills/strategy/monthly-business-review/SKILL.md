@@ -9,7 +9,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 # 월간 사업 리뷰 스킬
 
 > 매월 말/초 1회, 전사 OKR·P&L·AI 비용·전략 조정을 **한 번에** 점검.
-> 김이사(CSO)가 주도하되, 필요 시 CMO/CFO/CDO 서브에이전트 병렬 소집(Tier 2).
+> 엘리자베스(CSO)가 주도하되, 필요 시 CMO/CFO/CDO 서브에이전트 병렬 소집(Tier 2).
 
 ---
 
@@ -58,7 +58,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 | KR 1.1 | ... | ... | N% | 🟢/🟡/🔴 |
 | KR 1.2 | ... | ... | N% | 🟢/🟡/🔴 |
 
-**김이사 판단**: (목표 대비 진행, 차질 원인, 다음 달 조정)
+**엘리자베스 판단**: (목표 대비 진행, 차질 원인, 다음 달 조정)
 
 ### Objective 2: ...
 ```

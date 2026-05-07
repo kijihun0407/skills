@@ -16,7 +16,7 @@
 - `knowledge/channel-data/` 참조
 
 ## Phase 2 — 단계별 전환율 계산
-김이사 + CMO + CXO 협업:
+엘리자베스 + CMO + CXO 협업:
 
 | 단계 | 전환율 |
 |:---|---:|

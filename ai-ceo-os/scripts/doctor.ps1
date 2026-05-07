@@ -214,7 +214,7 @@ if ($script:Failed -gt 0) {
     Write-Host "⚠️  경고 $script:Warned 건. 계속 사용 가능하지만 해결 권장." -ForegroundColor Yellow
     exit 1
 } else {
-    Write-Host "✅ 모든 체크 통과. 김이사 호출 준비 완료." -ForegroundColor Green
+    Write-Host "✅ 모든 체크 통과. 엘리자베스 호출 준비 완료." -ForegroundColor Green
     Write-Host ""
     Write-Host "다음 단계:"
     Write-Host "  claude → /kim-director"

@@ -80,7 +80,7 @@ allowed-tools: Read, Grep, Glob, Write
 Claude가 `when_to_use` 키워드를 감지하면 자동 발동.
 
 ### 방법 3: 서브에이전트 + 스킬 조합
-김이사(cso)나 CMO가 Tier 2 회의 중 스킬 파일을 Read하여 절차를 따름.
+엘리자베스(cso)나 CMO가 Tier 2 회의 중 스킬 파일을 Read하여 절차를 따름.
 
 ---
 

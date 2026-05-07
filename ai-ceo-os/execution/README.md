@@ -21,11 +21,11 @@ execution/
 - ❌ AI가 "대략 50만원 정도일 것 같습니다"라고 추론 → 잘못된 의사결정
 - ✅ AI가 `execution/sales_calculate.py`를 호출 → 실제 데이터 → 정확한 보고
 
-## 김이사가 사용하는 방식
+## 엘리자베스가 사용하는 방식
 
 ```
 CEO: "이번 달 매출 분석해줘"
-김이사: "execution/sales_monthly.py 실행 필요합니다"
+엘리자베스: "execution/sales_monthly.py 실행 필요합니다"
        → 스크립트 실행
        → 결과 데이터 받음
        → 분석 보고서 작성

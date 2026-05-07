@@ -4,9 +4,9 @@
 
 **Claude Code 위에서 실제로 작동하는** 9명 AI 임원 팀의 전체 구조를 공개합니다.
 
-- **CSO 김이사** (전략 총괄) + **CMO/CFO/CTO/CDO/COO/CCO/CPO/CXO** 8명 C-level
+- **CSO 엘리자베스** (전략 총괄) + **CMO/CFO/CTO/CDO/COO/CCO/CPO/CXO** 8명 C-level
 - 각 임원은 독립된 `.claude/agents/*.md` 서브에이전트로 실재합니다 — 흉내가 아닙니다
-- 3-Tier 운영 (일상은 김이사 단독, 복잡한 건은 2~3명 병렬 소집, 가격/런칭은 8명 전원 반박 라운드)
+- 3-Tier 운영 (일상은 엘리자베스 단독, 복잡한 건은 2~3명 병렬 소집, 가격/런칭은 8명 전원 반박 라운드)
 - 제1원칙 사고 + 참모진 × C-Suite 매트릭스 + 확신도 표기 + Zero-Inference Rule
 - 매 결정에 Cross-Lens 자가 점검 + Inversion(망치는 3가지 시나리오) 의무
 
@@ -18,7 +18,7 @@
 
 - **"AI 에이전트 만들었는데 3일 후 안 쓴다"** — 에이전트에 역할과 판단 기준이 없기 때문입니다
 - **"Claude 프로젝트 파일을 어떻게 구조화해야 할지 모르겠다"** — CLAUDE.md 하나가 AI OS의 두뇌입니다
-- **"1인 기업인데 팀처럼 돌아가는 시스템이 필요하다"** — 9명의 C-Suite AI(CSO 김이사 + 8명)가 각자의 관점에서 판단합니다
+- **"1인 기업인데 팀처럼 돌아가는 시스템이 필요하다"** — 9명의 C-Suite AI(CSO 엘리자베스 + 8명)가 각자의 관점에서 판단합니다
 
 ---
 
@@ -30,7 +30,7 @@
 
 ```
 CEO (당신)
-  └── CSO 김이사 (전략 총괄)
+  └── CSO 엘리자베스 (전략 총괄)
        ├── CMO — 마케팅+세일즈
        ├── CFO — 재무+전략
        ├── CTO — 기술+인프라
@@ -41,12 +41,12 @@ CEO (당신)
        └── CXO — 고객경험+커뮤니티
 ```
 
-> **3-Tier 운영**: 일상 90%는 김이사 단독(Tier 1), 광고/시스템 변경 9%는 관련 임원 2~3명 소집(Tier 2), 가격/런칭/분기 리뷰 1%는 8명 전원 + 상호 반박(Tier 3). 상세: [agents/c-suite-protocol.md](agents/c-suite-protocol.md)
+> **3-Tier 운영**: 일상 90%는 엘리자베스 단독(Tier 1), 광고/시스템 변경 9%는 관련 임원 2~3명 소집(Tier 2), 가격/런칭/분기 리뷰 1%는 8명 전원 + 상호 반박(Tier 3). 상세: [agents/c-suite-protocol.md](agents/c-suite-protocol.md)
 
 ### 2. 워크플로우 파이프라인 (골드 스탠다드 3개 풀 공개)
 "릴스 대본 써줘"가 아닙니다. 기획→생산→분석까지 전체가 파이프라인으로 연결됩니다. 실제 Task tool 호출 블록까지 포함한 3개 레퍼런스 구현 공개:
 
-- `workflows/examples/weekly-briefing.md` — 주간 브리핑 (김이사 + Tier 2 조건부 소집)
+- `workflows/examples/weekly-briefing.md` — 주간 브리핑 (엘리자베스 + Tier 2 조건부 소집)
 - `workflows/examples/content-calendar.md` — 월간 콘텐츠 캘린더 (CCO + CMO 병렬)
 - `workflows/examples/reels-script-pipeline.md` — 릴스 대본 3버전 (CCO 주도 + CMO 검증)
 
@@ -61,7 +61,7 @@ AI의 두뇌를 설계하는 설정 파일. 이 하나의 파일이 AI가 당신
 반복되는 업무를 체계화한 매뉴얼. 검수 기준(스킬 이밸)까지 포함한 5개 스킬 풀 공개:
 
 - `skills/content/reels-script/` — 릴스 대본 3버전 + 캡션 3버전
-- `skills/strategy/weekly-briefing/` — 김이사 주간 브리핑
+- `skills/strategy/weekly-briefing/` — 엘리자베스 주간 브리핑
 - `skills/strategy/monthly-business-review/` — 월간 OKR/P&L/AI 운영 비용 리뷰
 - `skills/marketing/sales-analysis/` — C.L.O.S.E 퍼널 진단
 - `skills/edutech/course-design/` — L.E.A.R.N 커리큘럼 설계
@@ -91,7 +91,7 @@ claude
 ./scripts/doctor.sh       # macOS/Linux
 # .\scripts\doctor.ps1    # Windows
 
-# 6. 김이사 호출 → 선제 브리핑
+# 6. 엘리자베스 호출 → 선제 브리핑
 /kim-director
 ```
 
@@ -109,7 +109,7 @@ claude
 
 ```
 ai-ceo-os/
-├── agents/        ← AI 직원 정의 (C-Suite 9명: 김이사 + 8명)
+├── agents/        ← AI 직원 정의 (C-Suite 9명: 엘리자베스 + 8명)
 ├── context/       ← 사업 맥락 (CEO 페르소나, 미션)
 ├── knowledge/     ← 지식 저장소 (채널 데이터, 전략 참고)
 ├── skills/        ← 업무 매뉴얼

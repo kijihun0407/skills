@@ -28,7 +28,7 @@ allowed-tools: Read, Grep, Glob, Bash, WebSearch
 ## 0단계: CMO 서브에이전트 활성화 (권장)
 
 `.claude/agents/cmo.md` 서브에이전트로 전환 후 실행.
-단, 김이사(CSO) 단독 호출로도 가능.
+단, 엘리자베스(CSO) 단독 호출로도 가능.
 
 ---
 

@@ -132,7 +132,7 @@ def print_report(all_rows: list[dict]) -> None:
     print()
 
     print("=" * 60)
-    print("  📌 김이사 참고: 이 결과를 그대로 보고서에 인용하십시오.")
+    print("  📌 엘리자베스 참고: 이 결과를 그대로 보고서에 인용하십시오.")
     print("     추정/계산 금지 (Zero-Inference Rule).")
     print("=" * 60)
 

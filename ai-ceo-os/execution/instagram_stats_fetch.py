@@ -150,7 +150,7 @@ def main() -> None:
     out_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"[완료] {out_path} 저장 (게시물 {len(enriched)}건)")
-    print(f"[참고] 김이사는 이 파일의 숫자만 인용할 것. 추정 금지 (Zero-Inference)")
+    print(f"[참고] 엘리자베스는 이 파일의 숫자만 인용할 것. 추정 금지 (Zero-Inference)")
 
 
 if __name__ == "__main__":

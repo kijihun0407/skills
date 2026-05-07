@@ -85,7 +85,7 @@ AI 크리에이터 운영에 필요한 기술 인프라를 구축하고,
 | 레이어 | 개발 적용 | 위치 |
 |:---|:---|:---|
 | **Layer 1: Directive** | 자동화 스크립트 SOP, 랜딩페이지 제작 SOP | `directives/` |
-| **Layer 2: Orchestration** | CTO가 Directive 읽고 실행 도구 선택 | AI (김이사) |
+| **Layer 2: Orchestration** | CTO가 Directive 읽고 실행 도구 선택 | AI (엘리자베스) |
 | **Layer 3: Execution** | 인스타 통계 수집, 구글 시트 동기화 등 | `../../execution/` |
 
 ### 도구 우선 확인 원칙

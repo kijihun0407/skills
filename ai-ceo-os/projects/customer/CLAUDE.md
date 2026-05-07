@@ -44,7 +44,7 @@
 | 레이어 | 고객 적용 | 위치 |
 |:---|:---|:---|
 | **Layer 1: Directive** | DM 응대 SOP, 전환 온보딩 SOP | `directives/` |
-| **Layer 2: Orchestration** | CXO가 Directive 읽고 응대 방식 결정 | AI (김이사) |
+| **Layer 2: Orchestration** | CXO가 Directive 읽고 응대 방식 결정 | AI (엘리자베스) |
 | **Layer 3: Execution** | 피드백 수집 스크립트, 전환율 계산 | `../../execution/` |
 
 ### 도구 우선 확인 원칙

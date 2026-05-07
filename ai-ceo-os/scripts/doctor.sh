@@ -256,7 +256,7 @@ elif [ "$WARNED" -gt 0 ]; then
     echo -e "${YELLOW}⚠️  경고 $WARNED건. 계속 사용 가능하지만 해결 권장.${NC}"
     exit 1
 else
-    echo -e "${GREEN}✅ 모든 체크 통과. 김이사 호출 준비 완료.${NC}"
+    echo -e "${GREEN}✅ 모든 체크 통과. 엘리자베스 호출 준비 완료.${NC}"
     echo ""
     echo "다음 단계:"
     echo "  claude → /kim-director"

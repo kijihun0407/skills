@@ -82,7 +82,7 @@
 | 레이어 | 마케팅 적용 | 위치 |
 |:---|:---|:---|
 | **Layer 1: Directive** | 릴스 제작 SOP, 콘텐츠 캘린더 SOP | `directives/` |
-| **Layer 2: Orchestration** | CMO/CCO가 Directive 읽고 실행 지휘 | AI (김이사) |
+| **Layer 2: Orchestration** | CMO/CCO가 Directive 읽고 실행 지휘 | AI (엘리자베스) |
 | **Layer 3: Execution** | 인스타 통계 수집, 성과 계산 스크립트 | `../../execution/` |
 
 ### 도구 우선 확인 원칙

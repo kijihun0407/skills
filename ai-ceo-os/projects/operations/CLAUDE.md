@@ -43,7 +43,7 @@
 | 레이어 | 운영 적용 | 위치 |
 |:---|:---|:---|
 | **Layer 1: Directive** | 주간 브리핑 SOP, 루틴 설계 SOP | `directives/` |
-| **Layer 2: Orchestration** | COO가 Directive 읽고 브리핑 구성 | AI (김이사) |
+| **Layer 2: Orchestration** | COO가 Directive 읽고 브리핑 구성 | AI (엘리자베스) |
 | **Layer 3: Execution** | KPI 집계 스크립트, 일정 자동화 | `../../execution/` |
 
 ### 도구 우선 확인 원칙
