@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Reels — ElevenLabs + VideoFX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+  }
+  canvas { transform-origin: center center; display: block; }
+  #controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 100;
+  }
+  button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.2s;
+  }
+  button:hover { background: rgba(255,255,255,0.22); }
+  button:disabled { opacity: 0.4; cursor: default; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="controls">
+  <button id="btnPlay">&#9654; 재생</button>
+  <button id="btnRec">&#9210; 녹화 시작</button>
+</div>
+
+<script>
+// ─── Constants ────────────────────────────────────────────────────────────────
+const W = 1080, H = 1920, TOTAL = 35000, FPS = 30, BITRATE = 8_000_000;
+const FONT_KR = '"Noto Sans KR", sans-serif';
+const FONT_EN = '"Inter", sans-serif';
+const BLUE   = '#4B6FFF';
+const PURPLE = '#8B5CF6';
+const WHITE  = '#FFFFFF';
+
+const canvas = document.getElementById('c');
+const ctx    = canvas.getContext('2d');
+canvas.width  = W;
+canvas.height = H;
+
+function scaleCanvas() {
+  const s = Math.min(window.innerWidth / W, window.innerHeight / H) * 0.95;
+  canvas.style.transform = `scale(${s})`;
+}
+scaleCanvas();
+window.addEventListener('resize', scaleCanvas);
+
+// ─── Easing ───────────────────────────────────────────────────────────────────
+const lerp  = (a, b, t) => a + (b - a) * t;
+const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+const easeOut  = t => 1 - Math.pow(1 - t, 3);
+const easeInOut = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+
+// ─── Scene list ───────────────────────────────────────────────────────────────
+// hook(0-4s) → videofx(4-12s) → eleven(12-20s) → result(20-26s) → impact(26-30s) → cta(30-35s)
+const SCENES = [
+  { id: 'hook',    s: 0,     e: 4000  },
+  { id: 'videofx', s: 4000,  e: 12000 },
+  { id: 'eleven',  s: 12000, e: 20000 },
+  { id: 'result',  s: 20000, e: 26000 },
+  { id: 'impact',  s: 26000, e: 30000 },
+  { id: 'cta',     s: 30000, e: 35000 },
+];
+
+// ─── Particles ────────────────────────────────────────────────────────────────
+const PARTICLES = Array.from({ length: 90 }, () => ({
+  x:       Math.random() * W,
+  y:       Math.random() * H,
+  r:       Math.random() * 1.6 + 0.3,
+  speed:   Math.random() * 0.28 + 0.08,
+  opacity: Math.random() * 0.35 + 0.08,
+  drift:   (Math.random() - 0.5) * 0.14,
+}));
+
+function updateParticles() {
+  PARTICLES.forEach(p => {
+    p.y -= p.speed;
+    p.x += p.drift;
+    if (p.y < -10)    { p.y = H + 10; p.x = Math.random() * W; }
+    if (p.x < -10)    p.x = W + 10;
+    if (p.x > W + 10) p.x = -10;
+  });
+}
+
+// ─── Background ───────────────────────────────────────────────────────────────
+function drawBg() {
+  ctx.fillStyle = '#07070F';
+  ctx.fillRect(0, 0, W, H);
+
+  const atm1 = ctx.createRadialGradient(W * 0.5, 0, 0, W * 0.5, 0, H * 0.72);
+  atm1.addColorStop(0, 'rgba(20,14,70,0.85)');
+  atm1.addColorStop(1, 'transparent');
+  ctx.fillStyle = atm1;
+  ctx.fillRect(0, 0, W, H);
+
+  const atm2 = ctx.createRadialGradient(W * 0.18, H, 0, W * 0.18, H, H * 0.55);
+  atm2.addColorStop(0, 'rgba(0,55,140,0.22)');
+  atm2.addColorStop(1, 'transparent');
+  ctx.fillStyle = atm2;
+  ctx.fillRect(0, 0, W, H);
+
+  const atm3 = ctx.createRadialGradient(W * 0.82, H * 0.6, 0, W * 0.82, H * 0.6, H * 0.4);
+  atm3.addColorStop(0, 'rgba(90,0,110,0.18)');
+  atm3.addColorStop(1, 'transparent');
+  ctx.fillStyle = atm3;
+  ctx.fillRect(0, 0, W, H);
+
+  PARTICLES.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(180,200,255,${p.opacity})`;
+    ctx.fill();
+  });
+
+  // Top vignette
+  const vigT = ctx.createLinearGradient(0, 0, 0, 400);
+  vigT.addColorStop(0, 'rgba(4,3,18,0.88)');
+  vigT.addColorStop(1, 'transparent');
+  ctx.fillStyle = vigT;
+  ctx.fillRect(0, 0, W, 400);
+
+  // Bottom vignette
+  const vigB = ctx.createLinearGradient(0, H - 750, 0, H);
+  vigB.addColorStop(0, 'transparent');
+  vigB.addColorStop(1, 'rgba(4,3,18,0.97)');
+  ctx.fillStyle = vigB;
+  ctx.fillRect(0, H - 750, W, 750);
+}
+
+// ─── Channel badge ────────────────────────────────────────────────────────────
+function drawChannelBadge() {
+  const text = '@ai.saver_';
+  const px = 80, py = 76, h = 58, pad = 30;
+  ctx.save();
+  ctx.font = `600 28px ${FONT_EN}`;
+  const tw = ctx.measureText(text).width;
+  ctx.beginPath();
+  ctx.roundRect(px, py, tw + pad * 2, h, h / 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.16)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.84)';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, px + pad, py + h / 2);
+  ctx.restore();
+}
+
+// ─── Waveform bars ────────────────────────────────────────────────────────────
+const BAR_H = [40,60,90,130,100,160,200,170,240,200,280,300,260,300,280,260,300,280,240,200,170,240,200,160,130,100,90,60,40,30,50,80,110,90,140,180,220,180,260,300,280,300,260,300,280,260,300,280,240,200,170,140,110,80,50];
+
+function drawWaveform(cx, cy, alpha, t) {
+  const barW = 9, gap = 7;
+  const totalW = BAR_H.length * barW + (BAR_H.length - 1) * gap;
+  const startX = cx - totalW / 2;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  BAR_H.forEach((h, i) => {
+    const ah = h * (0.55 + 0.45 * Math.sin(t * 0.003 + i * 0.32));
+    const bx = startX + i * (barW + gap);
+    const by = cy - ah / 2;
+    const grad = ctx.createLinearGradient(0, by + ah, 0, by);
+    grad.addColorStop(0, '#4B6FFF');
+    grad.addColorStop(1, '#A78BFA');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(bx, by, barW, ah, barW / 2);
+    ctx.fill();
+  });
+  ctx.restore();
+}
+
+// ─── Card (glass morphism) ────────────────────────────────────────────────────
+function drawCard(x, y, w, h, r, fill, shadowColor) {
+  ctx.save();
+  ctx.shadowColor = shadowColor;
+  ctx.shadowBlur  = 36;
+  ctx.fillStyle   = fill;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(120,160,255,0.18)';
+  ctx.lineWidth   = 1.5;
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ─── Gradient text ────────────────────────────────────────────────────────────
+function gradText(text, cx, cy, font, c0, c1) {
+  ctx.font = font;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  const tw = ctx.measureText(text).width;
+  const grad = ctx.createLinearGradient(cx - tw / 2, 0, cx + tw / 2, 0);
+  grad.addColorStop(0, c0);
+  grad.addColorStop(1, c1);
+  ctx.fillStyle = grad;
+  ctx.fillText(text, cx, cy);
+}
+
+// ─── Arrow line ───────────────────────────────────────────────────────────────
+function drawArrow(x1, y, x2, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = 'rgba(75,111,255,0.55)';
+  ctx.lineWidth   = 2;
+  ctx.setLineDash([8, 7]);
+  ctx.beginPath();
+  ctx.moveTo(x1, y);
+  ctx.lineTo(x2 - 18, y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(75,111,255,0.8)';
+  ctx.beginPath();
+  ctx.moveTo(x2, y);
+  ctx.lineTo(x2 - 18, y - 9);
+  ctx.lineTo(x2 - 18, y + 9);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// ─── Mic icon (canvas-drawn) ──────────────────────────────────────────────────
+function drawMic(cx, cy, size, alpha) {
+  const bw = size * 0.30, bh = size * 0.46;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  // Body glow
+  ctx.shadowColor = BLUE;
+  ctx.shadowBlur  = size * 0.35;
+  ctx.fillStyle   = 'rgba(200,210,255,0.88)';
+  ctx.beginPath();
+  ctx.roundRect(cx - bw / 2, cy - bh * 0.65, bw, bh, bw / 2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = 'rgba(200,210,255,0.75)';
+  ctx.lineWidth   = size * 0.04;
+  ctx.lineCap     = 'round';
+
+  // Arc
+  ctx.beginPath();
+  ctx.arc(cx, cy - bh * 0.15, bw * 0.88, Math.PI, 0, false);
+  ctx.stroke();
+  // Stand
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - bh * 0.15 + bw * 0.88);
+  ctx.lineTo(cx, cy + bh * 0.38);
+  ctx.stroke();
+  // Base
+  ctx.beginPath();
+  ctx.moveTo(cx - bw * 0.72, cy + bh * 0.38);
+  ctx.lineTo(cx + bw * 0.72, cy + bh * 0.38);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ─── SCENE: Hook (0-4s) ───────────────────────────────────────────────────────
+function drawHook(e) {
+  const cx = W / 2, cy = H * 0.47;
+  const l1  = clamp(e / 700, 0, 1);
+  const l2  = clamp((e - 750) / 650, 0, 1);
+  const l3  = clamp((e - 1450) / 650, 0, 1);
+  const sub = clamp((e - 2250) / 600, 0, 1);
+  const wv  = clamp((e - 3000) / 600, 0, 1);
+
+  if (l1 > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(l1);
+    ctx.font        = `400 46px ${FONT_KR}`;
+    ctx.fillStyle   = 'rgba(150,170,255,0.7)';
+    ctx.textAlign   = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('사실 이 영상,', cx, cy - 200);
+    ctx.restore();
+  }
+  if (l2 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l2);
+    ctx.shadowColor  = BLUE;
+    ctx.shadowBlur   = 48;
+    ctx.font         = `900 164px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('찍은 게', cx, cy - 50);
+    ctx.restore();
+  }
+  if (l3 > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(l3);
+    ctx.shadowColor = PURPLE;
+    ctx.shadowBlur  = 64;
+    gradText('아닙니다.', cx, cy + 120, `900 160px ${FONT_KR}`, '#6B8FFF', '#A78BFA');
+    ctx.restore();
+  }
+  if (sub > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(sub) * 0.65;
+    ctx.font         = `400 42px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('목소리도요.', cx, cy + 268);
+    ctx.restore();
+  }
+  if (wv > 0) {
+    drawWaveform(cx, H * 0.82, easeOut(wv) * 0.16, e);
+  }
+}
+
+// ─── SCENE: VideoFX (4-12s) ───────────────────────────────────────────────────
+function drawVideoFX(e) {
+  const cx = W / 2, cy = H * 0.44;
+  const cW = 920, cH = 600;
+  const cX = cx - cW / 2;
+
+  const eyeT  = clamp(e / 450, 0, 1);
+  const cardT = clamp((e - 300) / 650, 0, 1);
+  const s1T   = clamp((e - 1100) / 600, 0, 1);
+  const arrT  = clamp((e - 1850) / 500, 0, 1);
+  const s2T   = clamp((e - 2450) / 600, 0, 1);
+  const descT = clamp((e - 3200) / 650, 0, 1);
+  const wvT   = clamp((e - 4200) / 700, 0, 1);
+
+  const cY = cy - cH / 2 + lerp(70, 0, easeOut(cardT));
+
+  if (eyeT > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(eyeT);
+    ctx.font         = `700 30px ${FONT_EN}`;
+    ctx.fillStyle    = 'rgba(150,170,255,0.62)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('STEP 01', cx, cY - 52);
+    ctx.restore();
+  }
+  if (cardT > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(cardT);
+    drawCard(cX, cY, cW, cH, 32, 'rgba(18,14,48,0.72)', 'rgba(75,111,255,0.14)');
+    ctx.restore();
+  }
+  if (s1T > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(s1T);
+    ctx.shadowColor = BLUE;
+    ctx.shadowBlur  = 32;
+    gradText('VideoFX', cx, cY + 130, `900 100px ${FONT_EN}`, '#6B8FFF', '#A78BFA');
+    ctx.restore();
+  }
+  if (arrT > 0) {
+    drawArrow(cX + 80, cY + 248, cX + cW - 80, easeOut(arrT));
+  }
+  if (s2T > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(s2T);
+    ctx.font         = `700 54px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('AI가 배경 영상 생성', cx, cY + 360);
+    ctx.restore();
+  }
+  if (descT > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(descT) * 0.58;
+    ctx.font         = `400 36px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('텍스트 한 줄로 원하는 영상이 나온다', cx, cY + 460);
+    ctx.restore();
+  }
+  if (wvT > 0) {
+    drawWaveform(cx, H * 0.83, easeOut(wvT) * 0.19, e);
+  }
+}
+
+// ─── SCENE: ElevenLabs (12-20s) ───────────────────────────────────────────────
+function drawElevenLabs(e) {
+  const cx = W / 2, cy = H * 0.44;
+  const cW = 920, cH = 660;
+  const cX = cx - cW / 2;
+
+  const eyeT  = clamp(e / 450, 0, 1);
+  const cardT = clamp((e - 300) / 650, 0, 1);
+  const micT  = clamp((e - 1000) / 800, 0, 1);
+  const s1T   = clamp((e - 1900) / 600, 0, 1);
+  const arrT  = clamp((e - 2600) / 500, 0, 1);
+  const s2T   = clamp((e - 3200) / 600, 0, 1);
+  const descT = clamp((e - 4000) / 650, 0, 1);
+  const wvT   = clamp((e - 5000) / 700, 0, 1);
+
+  const cY = cy - cH / 2 + lerp(70, 0, easeOut(cardT));
+
+  if (eyeT > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(eyeT);
+    ctx.font         = `700 30px ${FONT_EN}`;
+    ctx.fillStyle    = 'rgba(167,139,250,0.65)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('STEP 02', cx, cY - 52);
+    ctx.restore();
+  }
+  if (cardT > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(cardT);
+    drawCard(cX, cY, cW, cH, 32, 'rgba(26,12,56,0.72)', 'rgba(139,92,246,0.18)');
+    ctx.restore();
+  }
+  // Pulse rings + mic
+  if (micT > 0) {
+    const micAlpha = easeOut(micT);
+    [0, 1, 2].forEach(i => {
+      const rr = 78 + i * 28 + Math.sin(e * 0.003 + i * 1.1) * 7;
+      ctx.save();
+      ctx.globalAlpha = micAlpha * (0.38 - i * 0.1);
+      ctx.strokeStyle = i % 2 === 0 ? BLUE : PURPLE;
+      ctx.lineWidth   = 1.5;
+      ctx.beginPath();
+      ctx.arc(cx, cY + 108, rr, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    });
+    drawMic(cx, cY + 108, 140, micAlpha);
+  }
+  if (s1T > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(s1T);
+    ctx.shadowColor = PURPLE;
+    ctx.shadowBlur  = 32;
+    gradText('ElevenLabs', cx, cY + 290, `900 90px ${FONT_EN}`, '#A78BFA', '#6B8FFF');
+    ctx.restore();
+  }
+  if (arrT > 0) {
+    drawArrow(cX + 80, cY + 390, cX + cW - 80, easeOut(arrT));
+  }
+  if (s2T > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(s2T);
+    ctx.font         = `700 54px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('AI가 내 목소리 복제', cx, cY + 490);
+    ctx.restore();
+  }
+  if (descT > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(descT) * 0.58;
+    ctx.font         = `400 36px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('학습 데이터 30초면 충분', cx, cY + 578);
+    ctx.restore();
+  }
+  if (wvT > 0) {
+    drawWaveform(cx, H * 0.83, easeOut(wvT) * 0.22, e);
+  }
+}
+
+// ─── SCENE: Result (20-26s) ───────────────────────────────────────────────────
+function drawResult(e) {
+  const cx = W / 2, cy = H * 0.46;
+  const l1   = clamp(e / 600, 0, 1);
+  const l2   = clamp((e - 700) / 700, 0, 1);
+  const divT = clamp((e - 1500) / 400, 0, 1);
+  const l3   = clamp((e - 2000) / 700, 0, 1);
+  const wvT  = clamp((e - 3000) / 600, 0, 1);
+
+  if (l1 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l1);
+    ctx.font         = `400 50px ${FONT_KR}`;
+    ctx.fillStyle    = 'rgba(150,170,255,0.72)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('결과:', cx, cy - 220);
+    ctx.restore();
+  }
+  if (l2 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l2);
+    ctx.shadowColor  = BLUE;
+    ctx.shadowBlur   = 52;
+    ctx.font         = `900 124px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('내가 없어도', cx, cy - 80);
+    ctx.restore();
+  }
+  if (divT > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(divT) * 0.38;
+    ctx.strokeStyle = 'rgba(120,160,255,0.55)';
+    ctx.lineWidth   = 1.5;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(cx - 280, cy + 30);
+    ctx.lineTo(cx + 280, cy + 30);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (l3 > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(l3);
+    ctx.shadowColor = PURPLE;
+    ctx.shadowBlur  = 60;
+    gradText('내 콘텐츠가', cx, cy + 160, `900 104px ${FONT_KR}`, '#6B8FFF', '#A78BFA');
+    ctx.shadowBlur  = 60;
+    gradText('나온다', cx, cy + 284, `900 104px ${FONT_KR}`, '#6B8FFF', '#A78BFA');
+    ctx.restore();
+  }
+  if (wvT > 0) {
+    drawWaveform(cx, H * 0.83, easeOut(wvT) * 0.2, e);
+  }
+}
+
+// ─── SCENE: Impact (26-30s) ───────────────────────────────────────────────────
+function drawImpact(e) {
+  const cx = W / 2, cy = H * 0.46;
+  const l1  = clamp(e / 500, 0, 1);
+  const numT = clamp((e - 550) / 700, 0, 1);
+  const l2  = clamp((e - 1350) / 600, 0, 1);
+  const subT = clamp((e - 2100) / 600, 0, 1);
+  const wvT  = clamp((e - 3000) / 600, 0, 1);
+
+  if (l1 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l1);
+    ctx.font         = `400 52px ${FONT_KR}`;
+    ctx.fillStyle    = 'rgba(150,170,255,0.7)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('세팅에 걸린 시간:', cx, cy - 220);
+    ctx.restore();
+  }
+  if (numT > 0) {
+    const pop = numT < 0.6
+      ? lerp(0.68, 1.1,  easeOut(numT / 0.6))
+      : lerp(1.1,  1.0,  easeOut((numT - 0.6) / 0.4));
+    ctx.save();
+    ctx.globalAlpha = easeOut(numT);
+    ctx.translate(cx, cy - 40);
+    ctx.scale(pop, pop);
+    ctx.shadowColor = BLUE;
+    ctx.shadowBlur  = 90;
+    gradText('10', 0, 0, `900 280px ${FONT_EN}`, '#6B8FFF', '#A78BFA');
+    ctx.restore();
+  }
+  if (l2 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l2);
+    ctx.font         = `700 82px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('분', cx + 72, cy + 120);
+    ctx.restore();
+  }
+  if (subT > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(subT);
+    ctx.font         = `900 74px ${FONT_KR}`;
+    ctx.fillStyle    = 'rgba(150,170,255,0.85)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('진짜임.', cx, cy + 260);
+    ctx.restore();
+  }
+  if (wvT > 0) {
+    drawWaveform(cx, H * 0.83, easeOut(wvT) * 0.2, e);
+  }
+}
+
+// ─── SCENE: CTA (30-35s) ─────────────────────────────────────────────────────
+function drawCTA(e) {
+  const cx = W / 2, cy = H * 0.45;
+  const l1   = clamp(e / 500, 0, 1);
+  const l2   = clamp((e - 600) / 650, 0, 1);
+  const cardT = clamp((e - 1400) / 800, 0, 1);
+  const kwT  = clamp((e - 2400) / 650, 0, 1);
+  const flwT = clamp((e - 3300) / 600, 0, 1);
+  const wvT  = clamp((e - 4000) / 600, 0, 1);
+
+  if (l1 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l1);
+    ctx.font         = `400 46px ${FONT_KR}`;
+    ctx.fillStyle    = 'rgba(150,170,255,0.7)';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('세팅법 드릴게요', cx, cy - 300);
+    ctx.restore();
+  }
+  if (l2 > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(l2);
+    ctx.shadowColor  = BLUE;
+    ctx.shadowBlur   = 44;
+    ctx.font         = `900 104px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('댓글에 \u2193', cx, cy - 170);
+    ctx.restore();
+  }
+  // Keyword card bg
+  if (cardT > 0) {
+    const kW = 700, kH = 156;
+    const kX = cx - kW / 2;
+    const kY = cy - kH / 2 + lerp(36, 0, easeOut(cardT)) - 20;
+    ctx.save();
+    ctx.globalAlpha = easeOut(cardT);
+    ctx.shadowColor = BLUE;
+    ctx.shadowBlur  = 44;
+    const grad = ctx.createLinearGradient(kX, 0, kX + kW, 0);
+    grad.addColorStop(0, 'rgba(75,111,255,0.26)');
+    grad.addColorStop(1, 'rgba(139,92,246,0.26)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.roundRect(kX, kY + 30, kW, kH, 24);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(120,160,255,0.28)';
+    ctx.lineWidth   = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (kwT > 0) {
+    ctx.save();
+    ctx.globalAlpha = easeOut(kwT);
+    ctx.shadowColor = BLUE;
+    ctx.shadowBlur  = 36;
+    gradText('"\uBAA9\uC18C\uB9AC"', cx, cy + 100, `900 92px ${FONT_KR}`, '#6B8FFF', '#A78BFA');
+    ctx.restore();
+  }
+  if (flwT > 0) {
+    ctx.save();
+    ctx.globalAlpha  = easeOut(flwT) * 0.72;
+    ctx.font         = `400 40px ${FONT_KR}`;
+    ctx.fillStyle    = WHITE;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('\uD314\uB85C\uC6B0\uD558\uACE0 \uB313\uAE00 \uB0A8\uACA8\uC8FC\uC138\uC694', cx, cy + 260);
+    ctx.restore();
+  }
+  if (wvT > 0) {
+    drawWaveform(cx, H * 0.83, easeOut(wvT) * 0.2, e);
+  }
+}
+
+// ─── Main render loop ─────────────────────────────────────────────────────────
+let startTime = null;
+let animId    = null;
+let isPlaying = false;
+
+function getScene(t) {
+  for (const sc of SCENES) { if (t >= sc.s && t < sc.e) return sc; }
+  return SCENES[SCENES.length - 1];
+}
+
+function render(now) {
+  if (!startTime) startTime = now;
+  const elapsed = now - startTime;
+  const t = Math.min(elapsed, TOTAL);
+
+  updateParticles();
+  drawBg();
+  drawChannelBadge();
+
+  const scene = getScene(t);
+  const se    = t - scene.s;
+
+  if (scene.id === 'hook')    drawHook(se);
+  if (scene.id === 'videofx') drawVideoFX(se);
+  if (scene.id === 'eleven')  drawElevenLabs(se);
+  if (scene.id === 'result')  drawResult(se);
+  if (scene.id === 'impact')  drawImpact(se);
+  if (scene.id === 'cta')     drawCTA(se);
+
+  if (t < TOTAL) {
+    animId = requestAnimationFrame(render);
+  } else {
+    if (window._recStopCb) { window._recStopCb(); window._recStopCb = null; }
+    isPlaying = false;
+    document.getElementById('btnPlay').textContent = '\u25B6 재생';
+    document.getElementById('btnRec').disabled     = false;
+    document.getElementById('btnRec').textContent  = '\u23FA 녹화 시작';
+  }
+}
+
+function play() {
+  if (animId) cancelAnimationFrame(animId);
+  startTime = null;
+  isPlaying = true;
+  PARTICLES.forEach(p => { p.y = Math.random() * H; });
+  animId = requestAnimationFrame(render);
+}
+
+// ─── Controls ─────────────────────────────────────────────────────────────────
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if (isPlaying) {
+    cancelAnimationFrame(animId);
+    isPlaying = false;
+    document.getElementById('btnPlay').textContent = '\u25B6 재생';
+  } else {
+    play();
+    document.getElementById('btnPlay').textContent = '\u23F9 정지';
+  }
+});
+
+document.getElementById('btnRec').addEventListener('click', () => {
+  const stream = canvas.captureStream(FPS);
+  const mime   = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+    ? 'video/webm;codecs=vp9' : 'video/webm';
+  const rec    = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: BITRATE });
+  const chunks = [];
+  rec.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  rec.onstop = () => {
+    const blob = new Blob(chunks, { type: mime });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'reels_elevenlabs_videofx.webm';
+    a.click();
+  };
+  window._recStopCb = () => { rec.stop(); };
+  setTimeout(() => {
+    if (window._recStopCb) { window._recStopCb(); window._recStopCb = null; }
+  }, TOTAL + 1500);
+  rec.start();
+  play();
+  document.getElementById('btnPlay').textContent = '\u23F9 정지';
+  document.getElementById('btnRec').textContent  = '\u23FA 녹화 중...';
+  document.getElementById('btnRec').disabled     = true;
+});
+
+// Initial static frame
+requestAnimationFrame(now => {
+  startTime = now - 100; // tiny offset so sceneElapsed > 0
+  updateParticles();
+  drawBg();
+  drawChannelBadge();
+  drawHook(100);
+  startTime = null;
+});
+</script>
+</body>
+</html>
