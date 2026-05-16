@@ -31,7 +31,7 @@ S2~S5 중 가장 임팩트 있는 결과물 1장 사용 (야구장 직관샷 추
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
-A hyperrealistic photo of a cute cat sitting in the grandstand of a Korean professional baseball stadium. The cat is wearing a baseball team cap, looking directly at the broadcast camera with a proud and composed expression. Shot with a telephoto lens — crowd behind is slightly blurred, stadium floodlights glowing overhead. A live broadcast HUD graphic is subtly overlaid in the corner. Slightly grainy texture like a real TV broadcast still capture. Cinematic, candid, photojournalistic feel.
+A hyperrealistic scene at a Korean professional baseball stadium. A cat wearing a baseball team cap and team uniform jersey is sitting in the cheering section among fans. The cat's image is being displayed live on the giant scoreboard jumbotron inside the stadium — the crowd around it is cheering and pointing at the screen. The jumbotron shows a close-up of the cat's face, clearly visible on the big screen. Stadium floodlights glowing, festive atmosphere, colorful crowd. Ultra-realistic, cinematic wide shot capturing both the cat in the stands and its image on the jumbotron simultaneously.
 ```
 
 ---
