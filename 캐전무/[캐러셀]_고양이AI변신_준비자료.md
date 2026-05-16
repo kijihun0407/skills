@@ -31,7 +31,7 @@ S2~S5 중 가장 임팩트 있는 결과물 1장 사용 (야구장 직관샷 추
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
-A hyperrealistic scene at a Korean professional baseball stadium. A cat wearing a baseball team cap and team uniform jersey is sitting in the cheering section among fans. The cat's image is being displayed live on the giant scoreboard jumbotron inside the stadium — the crowd around it is cheering and pointing at the screen. The jumbotron shows a close-up of the cat's face, clearly visible on the big screen. Stadium floodlights glowing, festive atmosphere, colorful crowd. Ultra-realistic, cinematic wide shot capturing both the cat in the stands and its image on the jumbotron simultaneously.
+An ultra-photorealistic, cinematic wide-angle shot inside a packed Korean professional baseball stadium at night. A cat wearing a baseball team cap and jersey is sitting in the cheering section surrounded by enthusiastic fans. The massive jumbotron scoreboard directly ahead is broadcasting a huge close-up of the cat's face live — fans around it are pointing and cheering at the screen in excitement. Dramatic stadium floodlights, vivid crowd colors, confetti in the air. Shot on Sony A1 with a 24mm lens, perfect exposure, 8K resolution, Pulitzer Prize-winning sports photography quality.
 ```
 
 ---
@@ -45,21 +45,21 @@ A hyperrealistic scene at a Korean professional baseball stadium. A cat wearing 
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
-A hyperrealistic broadcast-style photo of a cat caught by a Formula 1 TV camera in the grandstand. The cat is wearing Ferrari red team merchandise and has an intensely focused expression. Blurred F1 cars racing past in the background, motion blur on the cars. LIVE broadcast graphics subtly overlaid. Shot with a compressed telephoto lens. Ultra-realistic, looks exactly like a real F1 broadcast screenshot. Dramatic lighting from the track floodlights.
+An ultra-photorealistic Formula 1 broadcast television screenshot of a cat in the grandstand. The cat is wearing a full Ferrari red team cap, jacket, and scarf, with an intensely focused, passionate expression. Multiple F1 cars blur past at high speed in the background with dramatic motion trails. A LIVE broadcast overlay with timing graphics is visible. Shot with a 400mm telephoto lens, shallow depth of field, perfect broadcast lighting. The image is indistinguishable from a real Sky Sports F1 broadcast still. 8K resolution, award-winning sports photography.
 ```
 
 ---
 
-### S4 — 2000년대 디카 감성
+### S4 — Y2K 패션
 
-**태그:** Y2K DIGITAL CAMERA
-**헤드라인:** 2003년에 찍은 우리집 냥이
-**서브텍스트:** 추억 소환 감성
+**태그:** Y2K FASHION
+**헤드라인:** Y2K 패션 다 소화하는 냥이
+**서브텍스트:** 요즘 트렌드 완벽 적용
 **푸터:** @ai.saver_ (좌) / 4 / 7 (우)
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
-A photo of a cat taken with a 2000s point-and-shoot digital camera. Low resolution with visible JPEG compression artifacts, slight overexposure from direct flash, chromatic aberration on the edges, slightly off-center framing. The cat is sitting casually in a home environment. Washed-out, slightly oversaturated early 2000s color tone. Yellow date stamp in the bottom right corner showing "2003.08.15". Authentic nostalgic feel, like a real family photo from the early internet era.
+An ultra-photorealistic, high-fashion editorial photograph of a cat fully styled in peak Y2K fashion. The cat is wearing a rhinestone-studded crop top, low-rise flared jeans with a metallic butterfly belt, chunky platform sneakers, and butterfly hair clips. Holding a tiny holographic metallic baguette bag. Background is a vibrant Y2K-aesthetic studio set with iridescent holographic panels, inflatable furniture, and bold color gradients. Shot on Hasselblad H6D medium format camera, professional fashion studio lighting with a subtle warm lens flare. Vogue Korea editorial cover quality, ultra-sharp, 8K resolution, magazine-worthy composition.
 ```
 
 ---
@@ -73,7 +73,7 @@ A photo of a cat taken with a 2000s point-and-shoot digital camera. Low resoluti
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
-A hyperrealistic K-pop idol fancam photo of a cat. The cat appears center stage under concert spotlights, with colorful pink and purple stage lighting and confetti falling around it. Shot with a telephoto lens giving a compressed, intimate bokeh feel. The cat has a charismatic, confident idol-like expression. Background is a sea of glowing lightsticks blurred beautifully. Ultra-sharp focus on the cat's face and eyes. The aesthetic matches a high-quality Korean idol fancam clip still.
+An ultra-photorealistic concert photograph of a cat performing as a K-pop female idol on a massive arena stage. The cat is wearing a dazzling, custom-designed stage costume — a sparkling sequined mini dress with feather trim, thigh-high crystal boots, and glamorous stage accessories. The cat strikes a powerful performance pose at center stage. Behind it: massive LED screen displays, confetti cannons firing, colorful laser beams cutting through dry ice fog, and a sea of 50,000 glowing pink lightsticks in the audience. Shot with a Canon EOS R5 and 300mm telephoto lens, perfect concert lighting, bokeh crowd background. 8K resolution, professional concert photography, Grammy Awards performance quality.
 ```
 
 ---
@@ -105,7 +105,7 @@ A hyperrealistic K-pop idol fancam photo of a cat. The cat appears center stage 
 ### 한국어
 
 사진 한 장 넣었더니
-야구장 직관, F1 관중석, 2000년대 디카, K-pop 직캠까지
+야구장 전광판, F1 관중석, Y2K 패션화보, K-pop 여자 아이돌 콘서트까지
 전부 뽑아줬습니다.
 
 스타일만 바꿔도 분위기가 완전히 달라지는 게
@@ -122,8 +122,8 @@ A hyperrealistic K-pop idol fancam photo of a cat. The cat appears center stage 
 ———————————————————
 
 Gave ChatGPT Image 2.0 one photo of my cat
-and got a baseball stadium grandstand shot,
-F1 audience cam, Y2K digital camera, and a K-pop fancam
+and got a baseball stadium jumbotron shot,
+F1 grandstand cam, Y2K fashion editorial, and a K-pop female idol concert
 — all from a single photo.
 
 The whole vibe shifts completely just by changing the prompt.
