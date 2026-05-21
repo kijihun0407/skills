@@ -13,6 +13,8 @@
 
 | 파일 | 설명 |
 |:---|:---|
+| `전무-overview.md` | 릴전무·캐전무·바이브전무 방향성·제작 방식·전체 흐름 |
 | `content-research.md` | AI 트렌드 리서치 → 콘텐츠 주제 선정 SOP |
 | `reels-to-publish.md` | 릴스 대본 작성 → 발행 준비 SOP |
+| `carousel-design-guide.md` | 캐러셀 디자인 기준·슬라이드 구조 가이드 |
 | `weekly-review.md` | 주간 성과 리뷰 + 다음 주 계획 SOP |
