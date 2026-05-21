@@ -38,7 +38,7 @@ except ImportError:
 # 설정
 # ─────────────────────────────────────────
 
-MY_ACCOUNT = "ai.saver_"
+MY_ACCOUNT = "Grab_Prompt"
 
 COMPETITOR_ACCOUNTS = [
     "biggie_ai",       # 핵심 벤치마크 — 트렌드 중심
@@ -156,7 +156,7 @@ def collect_profile_and_posts(token: str, accounts: list[str]) -> list[dict]:
 
 
 def _username_from_url(url: str) -> str:
-    """https://www.instagram.com/ai.saver_/ → ai.saver_"""
+    """https://www.instagram.com/Grab_Prompt/ → Grab_Prompt"""
     url = url.rstrip("/")
     if "instagram.com/" in url:
         return url.split("instagram.com/")[-1].split("/")[0]

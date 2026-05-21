@@ -15,7 +15,7 @@
    - 수집 데이터: `knowledge/channel-data/apify_YYYYMMDD.json`
    - 경쟁계정: biggie_ai, ai_dori_, ai_ing_, brivvy_ai, ai.trend.kr, ai_freaks.kr, ai.favmag, promppy_com, ai.yeongseon, thisiskeepkwan
 
-2. **계정명 @ai.saver_ 확정**
+2. **계정명 @Grab_Prompt 확정**
    - 인스타그램 앱에서 직접 확인 후 변경 완료
    - 전체 파일 일괄 업데이트 완료
 
@@ -35,7 +35,7 @@
 
 ### 현재 상태
 
-- **계정명**: @ai.saver_ (인스타그램)
+- **계정명**: @Grab_Prompt (인스타그램)
 - **AI 비서 이름**: 에드워드국왕폐하
 - **채널**: 인스타그램 초기 운영 (팔로워 거의 없음)
 - **상품**: 전자책 + 프롬프트 기획 단계 (미출시)
@@ -61,7 +61,7 @@
 ### 주의사항
 
 - 에이전트 파일들 (agents/ 하위)의 "엘리자베스" 표기는 유지 — CEO 지시
-- 릴스 대본: 반드시 [후킹] → [본문] → [CTA] 3단 구조 + @ai.saver_ 포함
+- 릴스 대본: 반드시 [후킹] → [본문] → [CTA] 3단 구조 + @Grab_Prompt 포함
 - 인스타 계정 가용성 확인: curl 사용 금지, 반드시 앱에서 직접 확인
 - 직장 병행 → 시간 효율 최우선
 - 3개월 목표: 팔로워 4만 + 월 수익 100~200만원

@@ -1,4 +1,4 @@
-# 캐러셀 디자인 가이드 — @ai.saver_ 표준
+# 캐러셀 디자인 가이드 — @Grab_Prompt 표준
 
 > 기준 파일: `.tmp/carousel_assets/carousel_ai_research.html` (AI 연구 데이터 유통기한 — 확정본)
 
@@ -175,7 +175,7 @@ font-family: 'Noto Sans KR', 'Inter', sans-serif;
   bottom:52px; left:72px; right:72px;
   display:flex; align-items:center; justify-content:space-between;
 }
-/* @ai.saver_ | 01 / 07 */
+/* @Grab_Prompt | 01 / 07 */
 
 /* 태그 pill */
 .tag {

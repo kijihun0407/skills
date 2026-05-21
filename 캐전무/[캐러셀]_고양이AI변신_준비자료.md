@@ -15,7 +15,7 @@
 **헤드라인:** 우리집 냥이도 인플루언서 쌉가능
 **서브텍스트:** 4가지 상황으로 변신시켜봤습니다
 **태그 (상단):** AI IMAGE
-**푸터:** @ai.saver_ (좌) / SWIPE → (우)
+**푸터:** @Grab_Prompt (좌) / SWIPE → (우)
 
 **이미지 안내:**
 S2~S5 중 가장 임팩트 있는 결과물 1장 사용 (야구장 직관샷 추천)
@@ -27,7 +27,7 @@ S2~S5 중 가장 임팩트 있는 결과물 1장 사용 (야구장 직관샷 추
 **태그:** BASEBALL STADIUM
 **헤드라인:** 야구장 직관 왔다 포착됨
 **서브텍스트:** 중계 카메라에 우리 고양이가?
-**푸터:** @ai.saver_ (좌) / 2 / 7 (우)
+**푸터:** @Grab_Prompt (좌) / 2 / 7 (우)
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
@@ -41,7 +41,7 @@ An ultra-photorealistic, cinematic wide-angle shot inside a packed Korean profes
 **태그:** F1 GRANDSTAND
 **헤드라인:** F1 중계 카메라에 포착됨
 **서브텍스트:** 페라리 응원하러 왔냐
-**푸터:** @ai.saver_ (좌) / 3 / 7 (우)
+**푸터:** @Grab_Prompt (좌) / 3 / 7 (우)
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
@@ -55,7 +55,7 @@ An ultra-photorealistic Formula 1 broadcast television screenshot of a cat in th
 **태그:** Y2K FASHION
 **헤드라인:** Y2K 패션 다 소화하는 냥이
 **서브텍스트:** 요즘 트렌드 완벽 적용
-**푸터:** @ai.saver_ (좌) / 4 / 7 (우)
+**푸터:** @Grab_Prompt (좌) / 4 / 7 (우)
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
@@ -69,7 +69,7 @@ An ultra-photorealistic, high-fashion editorial photograph of a cat fully styled
 **태그:** K-POP FANCAM
 **헤드라인:** 아이돌 직캠 찍혔냐
 **서브텍스트:** 무대 위 주인공 등극
-**푸터:** @ai.saver_ (좌) / 5 / 7 (우)
+**푸터:** @Grab_Prompt (좌) / 5 / 7 (우)
 
 **ChatGPT Image 2.0 프롬프트:**
 ```
@@ -87,7 +87,7 @@ An ultra-photorealistic concert photograph of a cat performing as a K-pop female
 1. ChatGPT 접속 → 이미지 만들기 클릭
 2. 고양이 사진 첨부
 3. 원하는 스타일 프롬프트 입력 → 생성
-**푸터:** @ai.saver_ (좌) / 6 / 7 (우)
+**푸터:** @Grab_Prompt (좌) / 6 / 7 (우)
 
 ---
 
@@ -96,7 +96,7 @@ An ultra-photorealistic concert photograph of a cat performing as a K-pop female
 **태그:** GET PROMPTS
 **헤드라인:** 우리 고양이 이름이 뭐에요?
 **서브텍스트:** 댓글에 이름 남겨주시면\n스타일별 프롬프트 4종 DM으로 보내드릴게요
-**푸터:** @ai.saver_ (좌) / 팔로우 ↑ (우)
+**푸터:** @Grab_Prompt (좌) / 팔로우 ↑ (우)
 
 ---
 
@@ -180,4 +180,4 @@ A hyperrealistic K-pop idol fancam photo of a cat center stage under concert spo
 ---
 
 팔로우하시면 이런 자료 계속 공유드려요!
-@ai.saver_
+@Grab_Prompt
